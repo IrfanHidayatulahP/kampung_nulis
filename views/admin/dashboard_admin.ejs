@@ -1,9 +1,9 @@
-<%- include('../partials/header.ejs', { title: 'Admin Dashboard' , user: user }) %>
+<%- include('../partials/header', { title: 'Admin Dashboard' }) %>
 
   <div class="card">
     <h2>Admin Dashboard</h2>
     <p class="small muted">Halo <strong>
-        <%= user.nama_lengkap || user.username %>
+        <%= (user && user.nama_lengkap) ? user.nama_lengkap : (user && user.username) || 'User' %>
       </strong> — Anda masuk sebagai <strong>Admin</strong>.</p>
 
     <div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:14px">
@@ -30,7 +30,7 @@
   <div class="card" style="margin-top:16px;">
     <h3>Detail Akun</h3>
 
-    <% if (user) { %>
+    <% if (typeof user !=='undefined' && user) { %>
       <ul>
         <li><strong>Username:</strong>
           <%= user.username %>
@@ -61,4 +61,4 @@
         <% } %>
   </div>
 
-  <%- include('../partials/footer.ejs') %>
+  <%- include('../partials/footer') %>

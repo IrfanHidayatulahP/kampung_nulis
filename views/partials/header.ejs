@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>
-        <%= title || 'Aplikasi' %>
+        <%= (typeof title !=='undefined' && title) ? title : 'Aplikasi' %>
     </title>
 
     <style>
@@ -16,69 +16,81 @@
             --accent: #2563eb;
             --danger: #ef4444;
             --radius: 10px;
+            --nav-height: 64px;
+            --sidebar-width: 280px;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
             font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
             background: var(--bg);
             margin: 0;
-            color: #111
+            color: #111;
+            padding-left: 0;
+            transition: padding-left 0.3s ease;
+        }
+
+        body.sidebar-open {
+            padding-left: var(--sidebar-width);
         }
 
         .container {
-            max-width: 1000px;
-            margin: 2.5rem auto;
-            padding: 1rem
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 16px
         }
 
-        header.appbar {
+        /* Top Header */
+        .appbar {
+            height: var(--nav-height);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 16px;
-            background: linear-gradient(90deg, #fff 0%, #f8fafc 100%);
-            box-shadow: 0 1px 4px rgba(12, 18, 38, 0.06);
-            border-radius: 12px
+            gap: 16px;
+            background: #fff;
+            padding: 0 12px;
+            box-shadow: 0 1px 6px rgba(12, 18, 38, 0.06);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            transition: left 0.3s ease;
+        }
+
+        body.sidebar-open .appbar {
+            left: var(--sidebar-width);
         }
 
         .brand {
             display: flex;
-            gap: 12px;
-            align-items: center
+            align-items: center;
+            gap: 12px
         }
 
-        .brand .logo {
-            width: 42px;
-            height: 42px;
+        .logo {
+            width: 44px;
+            height: 44px;
             border-radius: 8px;
             background: var(--accent);
-            color: white;
+            color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700
         }
 
-        nav .navlinks a {
-            margin-left: 12px;
-            color: var(--muted);
-            text-decoration: none;
-            font-weight: 600
+        .brand .title {
+            font-weight: 700
         }
 
-        .card {
-            background: var(--card);
-            padding: 18px;
-            border-radius: var(--radius);
-            box-shadow: 0 6px 18px rgba(12, 18, 38, 0.06);
-            margin-top: 1rem
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-top: 12px
+        .right-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px
         }
 
         .btn {
@@ -88,23 +100,18 @@
             background: var(--accent);
             color: #fff;
             text-decoration: none;
-            font-weight: 600
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
         }
 
         .btn-ghost {
-            background: transparent;
+            padding: 8px 10px;
+            border-radius: 8px;
             border: 1px solid #e5e7eb;
-            color: var(--muted)
-        }
-
-        .muted {
-            color: var(--muted)
-        }
-
-        form input,
-        form button,
-        form textarea {
-            font-family: inherit
+            background: transparent;
+            color: var(--muted);
+            text-decoration: none
         }
 
         .small {
@@ -112,42 +119,354 @@
             color: var(--muted)
         }
 
-        @media (max-width:700px) {
-            .grid {
-                grid-template-columns: 1fr
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            left: calc(-1 * var(--sidebar-width));
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: #fff;
+            box-shadow: 2px 0 12px rgba(12, 18, 38, 0.1);
+            transition: left 0.3s ease;
+            z-index: 200;
+            overflow-y: auto;
+        }
+
+        body.sidebar-open .sidebar {
+            left: 0;
+        }
+
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-close {
+            background: transparent;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--muted);
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .sidebar-close:hover {
+            background: #f3f4f6;
+        }
+
+        .sidebar-menu {
+            padding: 16px 0;
+        }
+
+        .sidebar-menu-item {
+            margin: 4px 12px;
+        }
+
+        .sidebar-menu-item>a,
+        .sidebar-menu-item>button {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: var(--muted);
+            text-decoration: none;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+        }
+
+        .sidebar-menu-item>a:hover,
+        .sidebar-menu-item>button:hover {
+            background: #f3f4f6;
+        }
+
+        .sidebar-menu-item>a.active {
+            background: #eef6ff;
+            color: var(--accent);
+        }
+
+        .sidebar-submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            margin-top: 4px;
+        }
+
+        .sidebar-submenu.open {
+            max-height: 500px;
+        }
+
+        .sidebar-submenu a {
+            display: block;
+            padding: 10px 16px 10px 48px;
+            color: #4b5563;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .sidebar-submenu a:hover {
+            background: #f3f4f6;
+            color: var(--accent);
+        }
+
+        .chevron {
+            transition: transform 0.3s ease;
+            font-size: 14px;
+        }
+
+        .chevron.open {
+            transform: rotate(180deg);
+        }
+
+        /* Toggle Button */
+        .sidebar-toggle {
+            background: var(--accent);
+            border: none;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar-toggle:hover {
+            background: #1d4ed8;
+        }
+
+        /* Overlay */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 150;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        body.sidebar-open .sidebar-overlay {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Content Spacing */
+        .page-content {
+            padding-top: calc(var(--nav-height) + 18px);
+        }
+
+        @media (max-width: 768px) {
+            body.sidebar-open {
+                padding-left: 0;
             }
 
-            .container {
-                padding: 0.5rem
+            body.sidebar-open .appbar {
+                left: 0;
+            }
+
+            .brand .title,
+            .small {
+                display: none;
+            }
+
+            .right-actions .small {
+                display: none;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <header class="appbar">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <div class="logo">L</div>
+                <div>
+                    <div class="title" style="font-weight: 700;">
+                        <%= (typeof title !=='undefined' && title) ? title : 'Aplikasi' %>
+                    </div>
+                    <div class="small">Library System</div>
+                </div>
+            </div>
+            <button class="sidebar-close" onclick="toggleSidebar()" aria-label="Close sidebar">×</button>
+        </div>
+
+        <nav class="sidebar-menu">
+            <!-- Peminjam -->
+            <div class="sidebar-menu-item">
+                <button onclick="toggleSubmenu('peminjam')">
+                    <span>Peminjam</span>
+                    <span class="chevron" id="chevron-peminjam">▼</span>
+                </button>
+                <div class="sidebar-submenu" id="submenu-peminjam">
+                    <a href="/peminjam">Daftar Peminjam</a>
+                    <a href="/peminjam/create">Tambah Peminjam</a>
+                    <a href="/peminjam/import">Import CSV</a>
+                </div>
+            </div>
+
+            <!-- Barang -->
+            <div class="sidebar-menu-item">
+                <button onclick="toggleSubmenu('barang')">
+                    <span>Barang</span>
+                    <span class="chevron" id="chevron-barang">▼</span>
+                </button>
+                <div class="sidebar-submenu" id="submenu-barang">
+                    <a href="/barang">Daftar Barang</a>
+                    <a href="/barang/create">Tambah Barang</a>
+                    <a href="/barang/categories">Kategori</a>
+                </div>
+            </div>
+
+            <!-- Sewa Barang -->
+            <div class="sidebar-menu-item">
+                <button onclick="toggleSubmenu('sewa')">
+                    <span>Sewa Barang</span>
+                    <span class="chevron" id="chevron-sewa">▼</span>
+                </button>
+                <div class="sidebar-submenu" id="submenu-sewa">
+                    <a href="/sewa">Daftar Sewa</a>
+                    <a href="/sewa/create">Tambah Sewa</a>
+                    <a href="/sewa/pengembalian">Pengembalian</a>
+                </div>
+            </div>
+
+            <!-- Transaksi -->
+            <div class="sidebar-menu-item">
+                <button onclick="toggleSubmenu('transaksi')">
+                    <span>Transaksi</span>
+                    <span class="chevron" id="chevron-transaksi">▼</span>
+                </button>
+                <div class="sidebar-submenu" id="submenu-transaksi">
+                    <a href="/transaksi">Daftar Transaksi</a>
+                    <a href="/transaksi/create">Buat Transaksi</a>
+                    <a href="/transaksi/laporan">Laporan</a>
+                </div>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Overlay -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Top Header -->
+    <header class="appbar">
+        <div style="display:flex;align-items:center;gap:16px;">
+            <button class="sidebar-toggle" onclick="toggleSidebar()">
+                <span>☰</span>
+                <span>Menu</span>
+            </button>
+
             <div class="brand">
                 <div class="logo">L</div>
                 <div>
-                    <div style="font-weight:700">
-                        <%= title || 'Aplikasi' %>
+                    <div class="title">
+                        <%= (typeof title !=='undefined' && title) ? title : 'Aplikasi' %>
                     </div>
                     <div class="small">Library / Sistem Peminjam</div>
                 </div>
             </div>
+        </div>
 
-            <nav class="navlinks">
-                <% if (typeof user !=='undefined' && user) { %>
-                    <span class="small muted">Hi, <strong>
-                            <%= user.nama_lengkap || user.username %>
-                        </strong></span>
-                    <a href="/" class="small muted" style="margin-left:10px">Home</a>
-                    <a href="/logout" class="small" style="margin-left:12px;color:var(--danger)">Logout</a>
-                    <% } else { %>
-                        <a href="/login" class="small muted">Login</a>
-                        <% } %>
-            </nav>
-        </header>
+        <!-- right actions -->
+        <div class="right-actions">
+            <% if (typeof user !=='undefined' && user) { %>
+                <div class="small muted">Hi, <strong>
+                        <%= user.nama_lengkap || user.username %>
+                    </strong></div>
+                <a href="/profile" class="btn-ghost">Profil</a>
+                <a href="/logout" class="btn" style="background:var(--danger)">Logout</a>
+                <% } else { %>
+                    <a href="/login" class="btn-ghost">Login</a>
+                    <a href="/register" class="btn">Daftar</a>
+                    <% } %>
+        </div>
+    </header>
 
-        <!-- page body -->
+    <!-- page body - container start -->
+    <div class="container page-content">
+
+        <script>
+            // Toggle sidebar
+            function toggleSidebar() {
+                document.body.classList.toggle('sidebar-open');
+                // Save state to localStorage
+                const isOpen = document.body.classList.contains('sidebar-open');
+                localStorage.setItem('sidebarOpen', isOpen);
+            }
+
+            // Toggle submenu
+            function toggleSubmenu(menuId) {
+                const submenu = document.getElementById('submenu-' + menuId);
+                const chevron = document.getElementById('chevron-' + menuId);
+
+                submenu.classList.toggle('open');
+                chevron.classList.toggle('open');
+
+                // Save state
+                const isOpen = submenu.classList.contains('open');
+                localStorage.setItem('submenu-' + menuId, isOpen);
+            }
+
+            // Restore sidebar state on page load
+            window.addEventListener('DOMContentLoaded', function () {
+                // Restore sidebar open/close state
+                const sidebarOpen = localStorage.getItem('sidebarOpen') === 'true';
+                if (sidebarOpen) {
+                    document.body.classList.add('sidebar-open');
+                }
+
+                // Restore submenu states
+                ['peminjam', 'barang', 'sewa', 'transaksi'].forEach(function (menuId) {
+                    const submenuOpen = localStorage.getItem('submenu-' + menuId) === 'true';
+                    if (submenuOpen) {
+                        document.getElementById('submenu-' + menuId).classList.add('open');
+                        document.getElementById('chevron-' + menuId).classList.add('open');
+                    }
+                });
+
+                // Auto-open submenu based on current path
+                const currentPath = '<%= (typeof currentPath !== "undefined" && currentPath) ? currentPath : "" %>';
+                if (currentPath) {
+                    if (currentPath.startsWith('/peminjam')) {
+                        document.getElementById('submenu-peminjam').classList.add('open');
+                        document.getElementById('chevron-peminjam').classList.add('open');
+                    } else if (currentPath.startsWith('/barang')) {
+                        document.getElementById('submenu-barang').classList.add('open');
+                        document.getElementById('chevron-barang').classList.add('open');
+                    } else if (currentPath.startsWith('/sewa')) {
+                        document.getElementById('submenu-sewa').classList.add('open');
+                        document.getElementById('chevron-sewa').classList.add('open');
+                    } else if (currentPath.startsWith('/transaksi')) {
+                        document.getElementById('submenu-transaksi').classList.add('open');
+                        document.getElementById('chevron-transaksi').classList.add('open');
+                    }
+                }
+            });
+        </script>
+        </document_content>
