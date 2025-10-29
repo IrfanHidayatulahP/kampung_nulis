@@ -1,0 +1,30 @@
+<%- include('../views/partials/header', { title: 'Dashboard Anggota' , user: user }) %>
+
+    <div class="card">
+        <h2>Dashboard Anggota</h2>
+        <p class="small muted">Halo <strong>
+                <%= user.nama_lengkap || user.username %>
+            </strong>, selamat datang kembali.</p>
+
+        <div class="grid" style="margin-top:14px">
+            <div class="card">
+                <h3>Pinjaman Saya</h3>
+                <p class="small muted">Lihat status buku yang sedang dipinjam dan riwayat peminjaman.</p>
+                <a href="/anggota/pinjaman" class="btn" style="margin-top:8px">Lihat Pinjaman</a>
+            </div>
+
+            <div class="card">
+                <h3>Cari Buku</h3>
+                <p class="small muted">Telusuri koleksi perpustakaan.</p>
+                <a href="/anggota/katalog" class="btn" style="margin-top:8px">Cari Buku</a>
+            </div>
+
+            <div class="card">
+                <h3>Profil</h3>
+                <p class="small muted">Perbarui data profil dan kontak Anda.</p>
+                <a href="/anggota/profile" class="btn" style="margin-top:8px">Edit Profil</a>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../views/partials/footer') %>

@@ -1,0 +1,64 @@
+<%- include('../partials/header.ejs', { title: 'Admin Dashboard' , user: user }) %>
+
+  <div class="card">
+    <h2>Admin Dashboard</h2>
+    <p class="small muted">Halo <strong>
+        <%= user.nama_lengkap || user.username %>
+      </strong> — Anda masuk sebagai <strong>Admin</strong>.</p>
+
+    <div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:14px">
+      <div class="card" style="flex:1;min-width:220px">
+        <h3>Manajemen Pengguna</h3>
+        <p class="small muted">Lihat, edit, dan kelola akun anggota.</p>
+        <a href="/admin/users" class="btn" style="margin-top:8px;display:inline-block">Kelola Pengguna</a>
+      </div>
+
+      <div class="card" style="flex:1;min-width:220px">
+        <h3>Statistik</h3>
+        <p class="small muted">Ringkasan peminjaman, buku, dan aktivitas sistem.</p>
+        <a href="/admin/stats" class="btn" style="margin-top:8px;display:inline-block">Lihat Statistik</a>
+      </div>
+
+      <div class="card" style="flex:1;min-width:220px">
+        <h3>Pengaturan</h3>
+        <p class="small muted">Atur konfigurasi sistem dan hak akses.</p>
+        <a href="/admin/settings" class="btn" style="margin-top:8px;display:inline-block">Pengaturan</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <h3>Detail Akun</h3>
+
+    <% if (user) { %>
+      <ul>
+        <li><strong>Username:</strong>
+          <%= user.username %>
+        </li>
+        <% if (user.nama_lengkap) { %>
+          <li><strong>Nama Lengkap:</strong>
+            <%= user.nama_lengkap %>
+          </li>
+          <% } %>
+            <% if (user.status) { %>
+              <li><strong>Status:</strong>
+                <%= user.status %>
+              </li>
+              <% } %>
+                <% if (user.alamat) { %>
+                  <li><strong>Alamat:</strong>
+                    <%= user.alamat %>
+                  </li>
+                  <% } %>
+                    <% if (user.no_telpon) { %>
+                      <li><strong>No. Telpon:</strong>
+                        <%= user.no_telpon %>
+                      </li>
+                      <% } %>
+      </ul>
+      <% } else { %>
+        <p class="small muted">Tidak ada data user. Silakan <a href="/login">login</a>.</p>
+        <% } %>
+  </div>
+
+  <%- include('../partials/footer.ejs') %>

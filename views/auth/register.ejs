@@ -1,0 +1,70 @@
+<%- include('../partials/header', { title: 'Daftar' , user: null }) %>
+
+    <div class="card" style="max-width:640px;margin:2rem auto">
+        <h2 style="margin:0 0 8px 0">Buat Akun Baru</h2>
+        <p class="small muted" style="margin-top:0">Isi form untuk mendaftar. Setelah berhasil, Anda akan diarahkan ke
+            halaman login.</p>
+
+        <% if (error) { %>
+            <div
+                style="background:#fff1f0;border:1px solid #ffdad6;color:#611a15;padding:10px;border-radius:8px;margin-top:12px">
+                <strong>Kesalahan:</strong>
+                <%= error %>
+            </div>
+            <% } %>
+
+                <form action="/register" method="post"
+                    style="margin-top:14px;display:flex;flex-direction:column;gap:10px">
+                    <div>
+                        <label class="small muted" for="username">Username <span
+                                style="color:#d00">*</span></label><br />
+                        <input id="username" name="username" type="text" value="<%= old.username || '' %>" required
+                            style="width:100%;padding:10px;border-radius:8px;border:1px solid #e6e9ef" />
+                    </div>
+
+                    <div>
+                        <label class="small muted" for="nama_lengkap">Nama Lengkap <span
+                                style="color:#d00">*</span></label><br />
+                        <input id="nama_lengkap" name="nama_lengkap" type="text" value="<%= old.nama_lengkap || '' %>"
+                            required style="width:100%;padding:10px;border-radius:8px;border:1px solid #e6e9ef" />
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                        <div>
+                            <label class="small muted" for="no_telpon">No. Telepon</label><br />
+                            <input id="no_telpon" name="no_telpon" type="text" value="<%= old.no_telpon || '' %>"
+                                style="width:100%;padding:10px;border-radius:8px;border:1px solid #e6e9ef" />
+                        </div>
+
+                        <div>
+                            <label class="small muted" for="alamat">Alamat</label><br />
+                            <input id="alamat" name="alamat" type="text" value="<%= old.alamat || '' %>"
+                                style="width:100%;padding:10px;border-radius:8px;border:1px solid #e6e9ef" />
+                        </div>
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                        <div>
+                            <label class="small muted" for="password">Password <span
+                                    style="color:#d00">*</span></label><br />
+                            <input id="password" name="password" type="password" required
+                                style="width:100%;padding:10px;border-radius:8px;border:1px solid #e6e9ef" />
+                        </div>
+
+                        <div>
+                            <label class="small muted" for="confirm_password">Konfirmasi Password <span
+                                    style="color:#d00">*</span></label><br />
+                            <input id="confirm_password" name="confirm_password" type="password" required
+                                style="width:100%;padding:10px;border-radius:8px;border:1px solid #e6e9ef" />
+                        </div>
+                    </div>
+
+                    <div style="display:flex;gap:10px;align-items:center;justify-content:flex-end">
+                        <a href="/login" class="btn-ghost"
+                            style="padding:8px 12px;border-radius:8px;text-decoration:none">Kembali ke Login</a>
+                        <button type="submit" class="btn">Daftar</button>
+                    </div>
+                </form>
+    </div>
+
+    <%- include('../partials/footer') %>

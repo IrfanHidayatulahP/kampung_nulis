@@ -1,0 +1,39 @@
+<%- include('../partials/header.ejs', { title: 'Login' , user: null }) %>
+
+    <div class="card" style="max-width:480px;margin:2rem auto">
+        <h2 style="margin:0 0 8px 0">Masuk ke Akun</h2>
+        <p class="small muted" style="margin-top:0">Masukkan username dan password Anda.</p>
+
+        <% if (error) { %>
+            <div
+                style="background:#fff1f0;border:1px solid #ffdad6;color:#611a15;padding:10px;border-radius:8px;margin-top:12px">
+                <strong>Kesalahan:</strong>
+                <%= error %>
+            </div>
+            <% } %>
+
+                <form action="/login" method="post" style="margin-top:14px;display:flex;flex-direction:column;gap:10px">
+                    <div>
+                        <label class="small muted" for="username">Username</label><br />
+                        <input id="username" name="username" type="text"
+                            value="<%= old && old.username ? old.username : '' %>" required
+                            style="width:100%;padding:10px;border-radius:8px;border:1px solid #e6e9ef" />
+                    </div>
+
+                    <div>
+                        <label class="small muted" for="password">Password</label><br />
+                        <input id="password" name="password" type="password" required
+                            style="width:100%;padding:10px;border-radius:8px;border:1px solid #e6e9ef" />
+                    </div>
+
+                    <div style="display:flex;gap:10px;align-items:center;justify-content:flex-end">
+                        <a href="/" class="btn-ghost"
+                            style="padding:8px 12px;border-radius:8px;text-decoration:none">Kembali</a>
+                        <button type="submit" class="btn">Masuk</button>
+                    </div>
+                </form>
+
+                <p class="small muted" style="margin-top:10px">Belum punya akun? <a href="/register">Daftar</a></p>
+    </div>
+
+    <%- include('../partials/footer.ejs') %>
