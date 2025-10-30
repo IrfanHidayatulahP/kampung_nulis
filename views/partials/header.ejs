@@ -5,30 +5,35 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>
-        <%= (typeof title !=='undefined' && title) ? title : 'Aplikasi' %>
+        <%= (typeof title !=='undefined' && title) ? title : 'Portal Kampung Nulis' %>
     </title>
 
     <style>
         :root {
-            --bg: #f6f8fb;
+            --primary: #1e3c72;
+            --primary-dark: #2a5298;
+            --primary-light: #7e8ba3;
+            --bg: #f1f5f9;
             --card: #ffffff;
-            --muted: #6b7280;
-            --accent: #2563eb;
-            --danger: #ef4444;
-            --radius: 10px;
-            --nav-height: 64px;
+            --muted: #64748b;
+            --accent: #2a5298;
+            --danger: #dc2626;
+            --success: #16a34a;
+            --radius: 12px;
+            --nav-height: 70px;
             --sidebar-width: 280px;
         }
 
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: var(--bg);
-            margin: 0;
-            color: #111;
+            color: #1e293b;
             padding-left: 0;
             transition: padding-left 0.3s ease;
         }
@@ -38,9 +43,9 @@
         }
 
         .container {
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 0 16px
+            padding: 0 20px;
         }
 
         /* Top Header */
@@ -50,9 +55,9 @@
             align-items: center;
             justify-content: space-between;
             gap: 16px;
-            background: #fff;
-            padding: 0 12px;
-            box-shadow: 0 1px 6px rgba(12, 18, 38, 0.06);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 0 20px;
+            box-shadow: 0 4px 12px rgba(30, 60, 114, 0.15);
             position: fixed;
             top: 0;
             left: 0;
@@ -68,55 +73,97 @@
         .brand {
             display: flex;
             align-items: center;
-            gap: 12px
+            gap: 14px;
         }
 
         .logo {
-            width: 44px;
-            height: 44px;
-            border-radius: 8px;
-            background: var(--accent);
-            color: #fff;
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            background: white;
+            color: var(--primary);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 700
+            font-weight: 700;
+            font-size: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .brand-text {
+            color: white;
         }
 
         .brand .title {
-            font-weight: 700
+            font-weight: 700;
+            font-size: 18px;
+            line-height: 1.2;
+        }
+
+        .brand .subtitle {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 2px;
         }
 
         .right-actions {
             display: flex;
             align-items: center;
-            gap: 12px
+            gap: 12px;
+        }
+
+        .user-greeting {
+            color: white;
+            font-size: 14px;
+        }
+
+        .user-greeting strong {
+            font-weight: 600;
         }
 
         .btn {
             display: inline-block;
-            padding: 8px 12px;
-            border-radius: 8px;
-            background: var(--accent);
-            color: #fff;
+            padding: 10px 18px;
+            border-radius: 10px;
+            background: white;
+            color: var(--primary);
             text-decoration: none;
             font-weight: 600;
             border: none;
             cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
         .btn-ghost {
-            padding: 8px 10px;
-            border-radius: 8px;
-            border: 1px solid #e5e7eb;
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
             background: transparent;
-            color: var(--muted);
-            text-decoration: none
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 14px;
         }
 
-        .small {
-            font-size: 0.9rem;
-            color: var(--muted)
+        .btn-ghost:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-logout {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-logout:hover {
+            background: #b91c1c;
         }
 
         /* Sidebar Styles */
@@ -126,8 +173,8 @@
             top: 0;
             width: var(--sidebar-width);
             height: 100vh;
-            background: #fff;
-            box-shadow: 2px 0 12px rgba(12, 18, 38, 0.1);
+            background: white;
+            box-shadow: 4px 0 16px rgba(30, 60, 114, 0.1);
             transition: left 0.3s ease;
             z-index: 200;
             overflow-y: auto;
@@ -138,11 +185,12 @@
         }
 
         .sidebar-header {
-            padding: 16px;
-            border-bottom: 1px solid #e5e7eb;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            color: white;
         }
 
         .sidebar-brand {
@@ -151,27 +199,52 @@
             gap: 12px;
         }
 
+        .sidebar-logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: white;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .sidebar-brand-text .title {
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .sidebar-brand-text .subtitle {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+
         .sidebar-close {
-            background: transparent;
+            background: rgba(255, 255, 255, 0.2);
             border: none;
             font-size: 24px;
             cursor: pointer;
-            color: var(--muted);
-            padding: 4px 8px;
-            border-radius: 6px;
-            transition: background 0.2s;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            line-height: 1;
         }
 
         .sidebar-close:hover {
-            background: #f3f4f6;
+            background: rgba(255, 255, 255, 0.3);
         }
 
         .sidebar-menu {
-            padding: 16px 0;
+            padding: 20px 0;
         }
 
         .sidebar-menu-item {
-            margin: 4px 12px;
+            margin: 4px 16px;
         }
 
         .sidebar-menu-item>a,
@@ -180,9 +253,9 @@
             align-items: center;
             justify-content: space-between;
             width: 100%;
-            padding: 12px 16px;
-            border-radius: 8px;
-            color: var(--muted);
+            padding: 14px 16px;
+            border-radius: 10px;
+            color: #475569;
             text-decoration: none;
             font-weight: 600;
             background: transparent;
@@ -190,16 +263,18 @@
             cursor: pointer;
             text-align: left;
             transition: all 0.2s;
+            font-size: 15px;
         }
 
         .sidebar-menu-item>a:hover,
         .sidebar-menu-item>button:hover {
-            background: #f3f4f6;
+            background: #f1f5f9;
+            color: var(--primary);
         }
 
         .sidebar-menu-item>a.active {
-            background: #eef6ff;
-            color: var(--accent);
+            background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+            color: var(--primary);
         }
 
         .sidebar-submenu {
@@ -215,22 +290,32 @@
 
         .sidebar-submenu a {
             display: block;
-            padding: 10px 16px 10px 48px;
-            color: #4b5563;
+            padding: 12px 16px 12px 52px;
+            color: #64748b;
             text-decoration: none;
-            border-radius: 6px;
-            font-size: 0.95rem;
+            border-radius: 8px;
+            font-size: 14px;
             transition: all 0.2s;
+            position: relative;
+        }
+
+        .sidebar-submenu a::before {
+            content: '›';
+            position: absolute;
+            left: 32px;
+            font-size: 18px;
+            font-weight: bold;
         }
 
         .sidebar-submenu a:hover {
-            background: #f3f4f6;
-            color: var(--accent);
+            background: #f1f5f9;
+            color: var(--primary);
+            padding-left: 56px;
         }
 
         .chevron {
             transition: transform 0.3s ease;
-            font-size: 14px;
+            font-size: 12px;
         }
 
         .chevron.open {
@@ -239,20 +324,23 @@
 
         /* Toggle Button */
         .sidebar-toggle {
-            background: var(--accent);
-            border: none;
-            color: #fff;
-            padding: 8px 12px;
-            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 10px;
             cursor: pointer;
             font-weight: 600;
             display: flex;
             align-items: center;
             gap: 8px;
+            transition: all 0.3s ease;
+            font-size: 14px;
         }
 
         .sidebar-toggle:hover {
-            background: #1d4ed8;
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
         }
 
         /* Overlay */
@@ -276,9 +364,28 @@
 
         /* Content Spacing */
         .page-content {
-            padding-top: calc(var(--nav-height) + 18px);
+            padding-top: calc(var(--nav-height) + 24px);
         }
 
+        /* Card Styles */
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+
+        .small {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .muted {
+            color: var(--muted);
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
             body.sidebar-open {
                 padding-left: 0;
@@ -288,13 +395,35 @@
                 left: 0;
             }
 
-            .brand .title,
-            .small {
+            .brand .subtitle,
+            .user-greeting {
                 display: none;
             }
 
-            .right-actions .small {
-                display: none;
+            .appbar {
+                padding: 0 12px;
+            }
+
+            .container {
+                padding: 0 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .brand .title {
+                font-size: 16px;
+            }
+
+            .logo {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+
+            .btn,
+            .btn-ghost {
+                padding: 8px 12px;
+                font-size: 13px;
             }
         }
     </style>
@@ -305,68 +434,87 @@
     <aside class="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-brand">
-                <div class="logo">L</div>
-                <div>
-                    <div class="title" style="font-weight: 700;">
-                        <%= (typeof title !=='undefined' && title) ? title : 'Aplikasi' %>
-                    </div>
-                    <div class="small">Library System</div>
+                <div class="sidebar-logo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M12 3L2 9v11h20V9L12 3zm0 2.2L19 9v9h-5v-6h-4v6H5V9l7-3.8zM14 18v-4h-4v4h4z" />
+                    </svg>
+                </div>
+                <div class="sidebar-brand-text">
+                    <div class="title">Kampung Nulis</div>
+                    <div class="subtitle">Portal Desa Digital</div>
                 </div>
             </div>
             <button class="sidebar-close" onclick="toggleSidebar()" aria-label="Close sidebar">×</button>
         </div>
 
         <nav class="sidebar-menu">
-            <!-- Peminjam -->
+            <!-- Dashboard -->
             <div class="sidebar-menu-item">
-                <button onclick="toggleSubmenu('peminjam')">
-                    <span>Peminjam</span>
-                    <span class="chevron" id="chevron-peminjam">▼</span>
+                <a href="/admin">
+                    <span>🏠 Dashboard</span>
+                </a>
+            </div>
+
+            <!-- Manajemen Warga -->
+            <div class="sidebar-menu-item">
+                <button onclick="toggleSubmenu('warga')">
+                    <span>👥 Manajemen Warga</span>
+                    <span class="chevron" id="chevron-warga">▼</span>
                 </button>
-                <div class="sidebar-submenu" id="submenu-peminjam">
-                    <a href="/peminjam">Daftar Peminjam</a>
-                    <a href="/peminjam/create">Tambah Peminjam</a>
-                    <a href="/peminjam/import">Import CSV</a>
+                <div class="sidebar-submenu" id="submenu-warga">
+                    <a href="/admin/warga">Daftar Warga</a>
+                    <a href="/admin/warga/create">Tambah Warga</a>
+                    <a href="/admin/warga/import">Import Data</a>
                 </div>
             </div>
 
-            <!-- Barang -->
+            <!-- Layanan Desa -->
             <div class="sidebar-menu-item">
-                <button onclick="toggleSubmenu('barang')">
-                    <span>Barang</span>
-                    <span class="chevron" id="chevron-barang">▼</span>
+                <button onclick="toggleSubmenu('layanan')">
+                    <span>📋 Layanan Desa</span>
+                    <span class="chevron" id="chevron-layanan">▼</span>
                 </button>
-                <div class="sidebar-submenu" id="submenu-barang">
-                    <a href="/barang">Daftar Barang</a>
-                    <a href="/barang/create">Tambah Barang</a>
-                    <a href="/barang/categories">Kategori</a>
+                <div class="sidebar-submenu" id="submenu-layanan">
+                    <a href="/admin/layanan">Daftar Layanan</a>
+                    <a href="/admin/layanan/surat">Surat Menyurat</a>
+                    <a href="/admin/layanan/permohonan">Permohonan</a>
                 </div>
             </div>
 
-            <!-- Sewa Barang -->
+            <!-- Pengumuman -->
             <div class="sidebar-menu-item">
-                <button onclick="toggleSubmenu('sewa')">
-                    <span>Sewa Barang</span>
-                    <span class="chevron" id="chevron-sewa">▼</span>
+                <button onclick="toggleSubmenu('pengumuman')">
+                    <span>📢 Pengumuman</span>
+                    <span class="chevron" id="chevron-pengumuman">▼</span>
                 </button>
-                <div class="sidebar-submenu" id="submenu-sewa">
-                    <a href="/sewa">Daftar Sewa</a>
-                    <a href="/sewa/create">Tambah Sewa</a>
-                    <a href="/sewa/pengembalian">Pengembalian</a>
+                <div class="sidebar-submenu" id="submenu-pengumuman">
+                    <a href="/admin/pengumuman">Daftar Pengumuman</a>
+                    <a href="/admin/pengumuman/create">Buat Pengumuman</a>
+                    <a href="/admin/pengumuman/kategori">Kategori</a>
                 </div>
             </div>
 
-            <!-- Transaksi -->
+            <!-- Keuangan -->
             <div class="sidebar-menu-item">
-                <button onclick="toggleSubmenu('transaksi')">
-                    <span>Transaksi</span>
-                    <span class="chevron" id="chevron-transaksi">▼</span>
+                <button onclick="toggleSubmenu('keuangan')">
+                    <span>💰 Keuangan Desa</span>
+                    <span class="chevron" id="chevron-keuangan">▼</span>
                 </button>
-                <div class="sidebar-submenu" id="submenu-transaksi">
-                    <a href="/transaksi">Daftar Transaksi</a>
-                    <a href="/transaksi/create">Buat Transaksi</a>
-                    <a href="/transaksi/laporan">Laporan</a>
+                <div class="sidebar-submenu" id="submenu-keuangan">
+                    <a href="/admin/keuangan">Dashboard Keuangan</a>
+                    <a href="/admin/keuangan/pemasukan">Pemasukan</a>
+                    <a href="/admin/keuangan/pengeluaran">Pengeluaran</a>
+                    <a href="/admin/keuangan/laporan">Laporan</a>
                 </div>
+            </div>
+
+            <!-- Pengaturan -->
+            <div class="sidebar-menu-item">
+                <a href="/admin/settings">
+                    <span>⚙️ Pengaturan</span>
+                </a>
             </div>
         </nav>
     </aside>
@@ -383,12 +531,18 @@
             </button>
 
             <div class="brand">
-                <div class="logo">L</div>
-                <div>
+                <div class="logo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M12 3L2 9v11h20V9L12 3zm0 2.2L19 9v9h-5v-6h-4v6H5V9l7-3.8zM14 18v-4h-4v4h4z" />
+                    </svg>
+                </div>
+                <div class="brand-text">
                     <div class="title">
-                        <%= (typeof title !=='undefined' && title) ? title : 'Aplikasi' %>
+                        <%= (typeof title !=='undefined' && title) ? title : 'Portal Kampung Nulis' %>
                     </div>
-                    <div class="small">Library / Sistem Peminjam</div>
+                    <div class="subtitle">Sistem Informasi Desa Digital</div>
                 </div>
             </div>
         </div>
@@ -396,13 +550,13 @@
         <!-- right actions -->
         <div class="right-actions">
             <% if (typeof user !=='undefined' && user) { %>
-                <div class="small muted">Hi, <strong>
+                <div class="user-greeting">Halo, <strong>
                         <%= user.nama_lengkap || user.username %>
                     </strong></div>
                 <a href="/profile" class="btn-ghost">Profil</a>
-                <a href="/logout" class="btn" style="background:var(--danger)">Logout</a>
+                <a href="/logout" class="btn btn-logout">Keluar</a>
                 <% } else { %>
-                    <a href="/login" class="btn-ghost">Login</a>
+                    <a href="/login" class="btn-ghost">Masuk</a>
                     <a href="/register" class="btn">Daftar</a>
                     <% } %>
         </div>
@@ -442,31 +596,34 @@
                 }
 
                 // Restore submenu states
-                ['peminjam', 'barang', 'sewa', 'transaksi'].forEach(function (menuId) {
+                ['warga', 'layanan', 'pengumuman', 'keuangan'].forEach(function (menuId) {
                     const submenuOpen = localStorage.getItem('submenu-' + menuId) === 'true';
                     if (submenuOpen) {
-                        document.getElementById('submenu-' + menuId).classList.add('open');
-                        document.getElementById('chevron-' + menuId).classList.add('open');
+                        const submenu = document.getElementById('submenu-' + menuId);
+                        const chevron = document.getElementById('chevron-' + menuId);
+                        if (submenu && chevron) {
+                            submenu.classList.add('open');
+                            chevron.classList.add('open');
+                        }
                     }
                 });
 
                 // Auto-open submenu based on current path
                 const currentPath = '<%= (typeof currentPath !== "undefined" && currentPath) ? currentPath : "" %>';
                 if (currentPath) {
-                    if (currentPath.startsWith('/peminjam')) {
-                        document.getElementById('submenu-peminjam').classList.add('open');
-                        document.getElementById('chevron-peminjam').classList.add('open');
-                    } else if (currentPath.startsWith('/barang')) {
-                        document.getElementById('submenu-barang').classList.add('open');
-                        document.getElementById('chevron-barang').classList.add('open');
-                    } else if (currentPath.startsWith('/sewa')) {
-                        document.getElementById('submenu-sewa').classList.add('open');
-                        document.getElementById('chevron-sewa').classList.add('open');
-                    } else if (currentPath.startsWith('/transaksi')) {
-                        document.getElementById('submenu-transaksi').classList.add('open');
-                        document.getElementById('chevron-transaksi').classList.add('open');
+                    if (currentPath.startsWith('/admin/warga')) {
+                        document.getElementById('submenu-warga').classList.add('open');
+                        document.getElementById('chevron-warga').classList.add('open');
+                    } else if (currentPath.startsWith('/admin/layanan')) {
+                        document.getElementById('submenu-layanan').classList.add('open');
+                        document.getElementById('chevron-layanan').classList.add('open');
+                    } else if (currentPath.startsWith('/admin/pengumuman')) {
+                        document.getElementById('submenu-pengumuman').classList.add('open');
+                        document.getElementById('chevron-pengumuman').classList.add('open');
+                    } else if (currentPath.startsWith('/admin/keuangan')) {
+                        document.getElementById('submenu-keuangan').classList.add('open');
+                        document.getElementById('chevron-keuangan').classList.add('open');
                     }
                 }
             });
         </script>
-        </document_content>

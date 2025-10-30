@@ -1,35 +1,304 @@
-    <div class="card" style="max-width:480px;margin:2rem auto">
-        <h2 style="margin:0 0 8px 0">Masuk ke Akun</h2>
-        <p class="small muted" style="margin-top:0">Masukkan username dan password Anda.</p>
+<!DOCTYPE html>
+<html lang="id">
 
-        <% if (error) { %>
-            <div
-                style="background:#fff1f0;border:1px solid #ffdad6;color:#611a15;padding:10px;border-radius:8px;margin-top:12px">
-                <strong>Kesalahan:</strong>
-                <%= error %>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Portal Desa</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e8ba3 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            top: -250px;
+            right: -250px;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 50%;
+            bottom: -200px;
+            left: -200px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            max-width: 900px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-side {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo svg {
+            width: 60px;
+            height: 60px;
+            fill: #1e3c72;
+        }
+
+        .login-side h1 {
+            font-size: 28px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .login-side p {
+            font-size: 14px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .ornament {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: -75px;
+            left: -75px;
+        }
+
+        .form-side {
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .form-side h2 {
+            font-size: 26px;
+            color: #1e3c72;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 32px;
+        }
+
+        .error-box {
+            background: #fff1f0;
+            border: 1px solid #ffdad6;
+            color: #c41e3a;
+            padding: 14px;
+            border-radius: 10px;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .error-box strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #2a5298;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(42, 82, 152, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 32px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(30, 60, 114, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #64748b;
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .footer-text a {
+            color: #2a5298;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer-text a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .login-container {
+                grid-template-columns: 1fr;
+            }
+
+            .login-side {
+                padding: 40px 30px;
+            }
+
+            .form-side {
+                padding: 40px 30px;
+            }
+
+            .button-group {
+                flex-direction: column-reverse;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-side">
+            <div class="ornament"></div>
+            <div class="logo">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 3L2 9v11h20V9L12 3zm0 2.2L19 9v9h-5v-6h-4v6H5V9l7-3.8zM14 18v-4h-4v4h4z" />
+                </svg>
             </div>
-            <% } %>
+            <h1>Portal Desa</h1>
+            <p>Sistem Informasi dan Layanan Digital Desa untuk Sewa Tenda dan barang barang untuk sebuah acara.</p>
+        </div>
 
-                <form action="/login" method="post" style="margin-top:14px;display:flex;flex-direction:column;gap:10px">
-                    <div>
-                        <label class="small muted" for="username">Username</label><br />
-                        <input id="username" name="username" type="text"
-                            value="<%= old && old.username ? old.username : '' %>" required
-                            style="width:100%;padding:10px;border-radius:8px;border:1px solid #e6e9ef" />
-                    </div>
+        <div class="form-side">
+            <h2>Masuk ke Akun</h2>
+            <p class="subtitle">Masukkan username dan password Anda.</p>
 
-                    <div>
-                        <label class="small muted" for="password">Password</label><br />
-                        <input id="password" name="password" type="password" required
-                            style="width:100%;padding:10px;border-radius:8px;border:1px solid #e6e9ef" />
-                    </div>
+            <!-- Uncomment untuk menampilkan error -->
+            <!-- <div class="error-box">
+                <strong>Kesalahan:</strong>
+                Username atau password salah. Silakan coba lagi.
+            </div> -->
 
-                    <div style="display:flex;gap:10px;align-items:center;justify-content:flex-end">
-                        <a href="/" class="btn-ghost"
-                            style="padding:8px 12px;border-radius:8px;text-decoration:none">Kembali</a>
-                        <button type="submit" class="btn">Masuk</button>
-                    </div>
-                </form>
+            <form action="/login" method="post">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required placeholder="Masukkan username" />
+                </div>
 
-                <p class="small muted" style="margin-top:10px">Belum punya akun? <a href="/register">Daftar</a></p>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required placeholder="Masukkan password" />
+                </div>
+
+                <div class="button-group">
+                    <a href="/" class="btn btn-secondary">Kembali</a>
+                    <button type="submit" class="btn btn-primary">Masuk</button>
+                </div>
+            </form>
+
+            <p class="footer-text">
+                Belum punya akun? <a href="/register">Daftar Sekarang</a>
+            </p>
+        </div>
     </div>
+</body>
+
+</html>
