@@ -1,0 +1,103 @@
+<%- include('../../partials/header.ejs', { title: 'Daftar Peminjam' , currentPath: '/peminjam/list-peminjam' , user:
+    user }) %>
+
+    <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <h2>Daftar Peminjam</h2>
+            <div>
+                <a href="/peminjam/create" class="btn">Tambah Peminjam</a>
+            </div>
+        </div>
+
+        <form method="GET" action="/peminjam/list-peminjam" style="margin-top:12px;display:flex;gap:8px;">
+            <input type="text" name="q" placeholder="Cari username / nama / no. telepon"
+                value="<%= typeof filter_q !== 'undefined' ? filter_q : '' %>"
+                style="flex:1;padding:8px;border-radius:8px;border:1px solid #ddd;">
+            <button class="btn-ghost" type="submit">Cari</button>
+        </form>
+
+        <div id="flash-wrapper" style="margin-top:12px;"></div>
+
+        <div style="overflow:auto;margin-top:12px;">
+            <table style="width:100%;border-collapse:collapse;">
+                <thead style="text-align:left">
+                    <tr>
+                        <th style="padding:10px;border-bottom:1px solid #eee">Username</th>
+                        <th style="padding:10px;border-bottom:1px solid #eee">Nama Lengkap</th>
+                        <th style="padding:10px;border-bottom:1px solid #eee">No. Telepon</th>
+                        <th style="padding:10px;border-bottom:1px solid #eee">Status</th>
+                        <th style="padding:10px;border-bottom:1px solid #eee">Tanggal Daftar</th>
+                        <th style="padding:10px;border-bottom:1px solid #eee;width:220px">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (!records || records.length===0) { %>
+                        <tr>
+                            <td colspan="6" style="padding:14px;text-align:center;color:var(--muted)">Belum ada data
+                                peminjam.</td>
+                        </tr>
+                        <% } else { %>
+                            <% records.forEach(function(item){ %>
+                                <tr>
+                                    <td style="padding:10px;border-bottom:1px solid #f4f4f4">
+                                        <%= item.username %>
+                                    </td>
+                                    <td style="padding:10px;border-bottom:1px solid #f4f4f4">
+                                        <%= item.nama_lengkap || '-' %>
+                                    </td>
+                                    <td style="padding:10px;border-bottom:1px solid #f4f4f4">
+                                        <%= item.no_telpon || '-' %>
+                                    </td>
+                                    <td style="padding:10px;border-bottom:1px solid #f4f4f4">
+                                        <%= item.status || '-' %>
+                                    </td>
+                                    <td style="padding:10px;border-bottom:1px solid #f4f4f4">
+                                        <%= item.tgl_daftar || '-' %>
+                                    </td>
+                                    <td style="padding:10px;border-bottom:1px solid #f4f4f4">
+
+                                        <button type="button" class="btn"
+                                            onclick="window.location.href='/peminjam/detail/<%= encodeURIComponent(item.username) %>'"
+                                            style="background: #2196F3; color: white; margin-right: 6px; padding:8px 10px; border-radius:8px; border:none;">Detail</button>
+
+                                        <button type="button" class="btn"
+                                            onclick="window.location.href='/peminjam/edit/<%= encodeURIComponent(item.username) %>'"
+                                            style="background: #4CAF50; color: white; margin-right: 6px; padding:8px 10px; border-radius:8px; border:none;">Edit</button>
+
+                                        <form method="POST"
+                                            action="/peminjam/delete/<%= encodeURIComponent(item.username) %>"
+                                            style="display:inline-block"
+                                            onsubmit="return confirmDelete('<%= item.username %>')">
+                                            <button type="submit" class="btn"
+                                                style="background:var(--danger);color:white;padding:8px 10px;border-radius:8px;border:none;">Hapus</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Handle delete confirmation
+        function confirmDelete(username) {
+            return confirm('Yakin ingin menghapus peminjam "' + username + '"? Tindakan ini tidak bisa dibatalkan.');
+        }
+
+        // Show flash from querystring (redirected actions set ?success=... or ?error=...)
+        (function showFlashFromQS() {
+            const params = new URLSearchParams(window.location.search);
+            const success = params.get('success');
+            const error = params.get('error');
+            const wrapper = document.getElementById('flash-wrapper');
+            if (success) {
+                wrapper.innerHTML = '<div class="card" style="background:var(--success);color:white;padding:10px;border-radius:8px;">' + decodeURIComponent(success) + '</div>';
+            } else if (error) {
+                wrapper.innerHTML = '<div class="card" style="background:var(--danger);color:white;padding:10px;border-radius:8px;">' + decodeURIComponent(error) + '</div>';
+            }
+        })();
+    </script>
+
+    <%- include('../../partials/footer.ejs') %>

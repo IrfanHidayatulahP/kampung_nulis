@@ -1,0 +1,58 @@
+<%- include('../../partials/header.ejs') %>
+    <div class="container mt-4">
+        <h2>Edit Barang</h2>
+
+
+        <% if (typeof error !=='undefined' && error) { %>
+            <div class="alert alert-danger">
+                <%= error %>
+            </div>
+            <% } %>
+                <% if (typeof success !=='undefined' && success) { %>
+                    <div class="alert alert-success">
+                        <%= success %>
+                    </div>
+                    <% } %>
+
+
+                        <form method="post" action="/barang/edit/<%= barang.id_barang %>">
+                            <div class="mb-3">
+                                <label class="form-label">Nama Barang</label>
+                                <input type="text" name="nama_barang" class="form-control"
+                                    value="<%= barang.nama_barang %>" required>
+                            </div>
+
+
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Jumlah Total</label>
+                                    <input type="number" name="jumlah_total" class="form-control" min="0"
+                                        value="<%= barang.jumlah_total %>" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Stok Tersedia</label>
+                                    <input type="number" name="stok_tersedia" class="form-control" min="0"
+                                        value="<%= barang.stok_tersedia %>" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Satuan</label>
+                                    <input type="text" name="satuan_jumlah" class="form-control"
+                                        value="<%= barang.satuan_jumlah %>">
+                                </div>
+                            </div>
+
+
+                            <div class="mb-3">
+                                <label class="form-label">Harga Dasar Sewa (Rp)</label>
+                                <input type="number" name="harga_dasar_sewa" class="form-control" min="0"
+                                    value="<%= barang.harga_dasar_sewa %>" required>
+                            </div>
+
+
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-primary">Update</button>
+                                <a href="/barang/list-barang" class="btn btn-secondary">Batal</a>
+                            </div>
+                        </form>
+    </div>
+    <%- include('../../partials/footer.ejs') %>

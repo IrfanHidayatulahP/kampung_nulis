@@ -1,0 +1,69 @@
+<%- include('../../partials/header.ejs', { title: 'Detail Peminjam' , currentPath: '/peminjam/detail' , user: user }) %>
+
+    <div class="card">
+        <h2>Detail Peminjam</h2>
+
+        <% if (typeof error !=='undefined' && error) { %>
+            <div style="margin-top:10px;padding:10px;border-radius:8px;background:var(--danger);color:white;">
+                <%= error %>
+            </div>
+            <% } %>
+
+                <div style="margin-top:12px;max-width:800px;">
+                    <table style="width:100%;border-collapse:collapse;">
+                        <tr>
+                            <td style="padding:8px;width:200px;font-weight:600;">Username</td>
+                            <td style="padding:8px;">
+                                <%= peminjam.username %>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px;font-weight:600;">Nama Lengkap</td>
+                            <td style="padding:8px;">
+                                <%= peminjam.nama_lengkap || '-' %>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px;font-weight:600;">Alamat</td>
+                            <td style="padding:8px;">
+                                <%= peminjam.alamat || '-' %>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px;font-weight:600;">No. Telepon</td>
+                            <td style="padding:8px;">
+                                <%= peminjam.no_telpon || '-' %>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px;font-weight:600;">Status</td>
+                            <td style="padding:8px;">
+                                <%= peminjam.status || '-' %>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px;font-weight:600;">Tanggal Daftar</td>
+                            <td style="padding:8px;">
+                                <%= peminjam.tgl_daftar || '-' %>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div style="margin-top:14px;">
+                        <a href="/peminjam/edit/<%= encodeURIComponent(peminjam.username) %>" class="btn"
+                            style="background:#2196F3;color:white;padding:8px 10px;border-radius:8px;border:none;">Edit</a>
+
+                        <form method="POST" action="/peminjam/delete/<%= encodeURIComponent(peminjam.username) %>"
+                            style="display:inline-block"
+                            onsubmit="return confirm('Yakin ingin menghapus peminjam ini?')">
+                            <button type="submit" class="btn"
+                                style="background:var(--danger);color:white;padding:8px 10px;border-radius:8px;border:none;margin-left:8px;">Hapus</button>
+                        </form>
+
+                        <a href="/peminjam/list-peminjam" class="btn"
+                            style="background:#6c757d;color:white;padding:8px 10px;border-radius:8px;border:none;margin-left:8px;">Kembali</a>
+                    </div>
+                </div>
+    </div>
+
+    <%- include('../../partials/footer.ejs') %>

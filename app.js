@@ -6,6 +6,8 @@ const bodyParser = require('body-parser');
 const path = require('path');
 
 const authRoutes = require('./routes/authRoutes');
+const peminjamRoutes = require('./routes/peminjamRoutes');
+const barangRoutes = require('./routes/barangRoutes');
 
 const app = express();
 
@@ -29,6 +31,8 @@ app.use(session({
 
 // Mount auth routes
 app.use('/', authRoutes);
+app.use('/peminjam', peminjamRoutes)
+app.use('/barang', barangRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, ()=> console.log(`Server berjalan di http://localhost:${PORT}`));

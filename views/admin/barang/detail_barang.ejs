@@ -1,0 +1,47 @@
+<%- include('../../partials/header.ejs') %>
+    <div class="container mt-4">
+        <h2>Detail Barang</h2>
+
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <%= barang.nama_barang %> <small class="text-muted">(ID: <%= barang.id_barang %>)</small>
+                </h5>
+
+
+                <dl class="row">
+                    <dt class="col-sm-3">Jumlah Total</dt>
+                    <dd class="col-sm-9">
+                        <%= barang.jumlah_total %>
+                    </dd>
+
+
+                    <dt class="col-sm-3">Stok Tersedia</dt>
+                    <dd class="col-sm-9">
+                        <%= barang.stok_tersedia %>
+                    </dd>
+
+
+                    <dt class="col-sm-3">Satuan</dt>
+                    <dd class="col-sm-9">
+                        <%= barang.satuan_jumlah || '-' %>
+                    </dd>
+
+
+                    <dt class="col-sm-3">Harga Dasar Sewa</dt>
+                    <dd class="col-sm-9">Rp <%= (barang.harga_dasar_sewa || 0).toLocaleString() %>
+                    </dd>
+                </dl>
+
+
+                <a href="/barang/edit/<%= barang.id_barang %>" class="btn btn-warning">Edit</a>
+                <form action="/barang/delete/<%= barang.id_barang %>" method="post" style="display:inline"
+                    onsubmit="return confirm('Hapus barang ini?');">
+                    <button class="btn btn-danger">Hapus</button>
+                </form>
+                <a href="/barang/list-barang" class="btn btn-secondary">Kembali</a>
+            </div>
+        </div>
+    </div>
+    <%- include('../../partials/footer.ejs') %>

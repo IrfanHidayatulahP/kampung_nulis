@@ -437,8 +437,7 @@
                 <div class="sidebar-logo">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
                         xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M12 3L2 9v11h20V9L12 3zm0 2.2L19 9v9h-5v-6h-4v6H5V9l7-3.8zM14 18v-4h-4v4h4z" />
+                        <path d="M12 3L2 9v11h20V9L12 3zm0 2.2L19 9v9h-5v-6h-4v6H5V9l7-3.8zM14 18v-4h-4v4h4z" />
                     </svg>
                 </div>
                 <div class="sidebar-brand-text">
@@ -452,34 +451,34 @@
         <nav class="sidebar-menu">
             <!-- Dashboard -->
             <div class="sidebar-menu-item">
-                <a href="/admin">
+                <a href="/admin/dashboard_admin">
                     <span>🏠 Dashboard</span>
                 </a>
             </div>
 
-            <!-- Manajemen Warga -->
+            <!-- Manajemen Peminjam -->
             <div class="sidebar-menu-item">
-                <button onclick="toggleSubmenu('warga')">
-                    <span>👥 Manajemen Warga</span>
-                    <span class="chevron" id="chevron-warga">▼</span>
+                <button onclick="toggleSubmenu('peminjam')" aria-expanded="false" aria-controls="submenu-peminjam">
+                    <span>👥 Manajemen Peminjam</span>
+                    <span class="chevron" id="chevron-peminjam">▼</span>
                 </button>
-                <div class="sidebar-submenu" id="submenu-warga">
-                    <a href="/admin/warga">Daftar Warga</a>
-                    <a href="/admin/warga/create">Tambah Warga</a>
-                    <a href="/admin/warga/import">Import Data</a>
+
+                <div class="sidebar-submenu" id="submenu-peminjam">
+                    <a class="sidebar-link" href="/peminjam/list-peminjam">Daftar Peminjam</a>
+                    <a class="sidebar-link" href="/peminjam/create">Tambah Peminjam</a>
+                    <a class="sidebar-link" href="/peminjam/import">Import Data</a>
                 </div>
             </div>
 
-            <!-- Layanan Desa -->
+            <!-- Barang Sewaan -->
             <div class="sidebar-menu-item">
-                <button onclick="toggleSubmenu('layanan')">
-                    <span>📋 Layanan Desa</span>
-                    <span class="chevron" id="chevron-layanan">▼</span>
+                <button onclick="toggleSubmenu('barang')">
+                    <span>📋  Barang Sewaan</span>
+                    <span class="chevron" id="chevron-barang">▼</span>
                 </button>
-                <div class="sidebar-submenu" id="submenu-layanan">
-                    <a href="/admin/layanan">Daftar Layanan</a>
-                    <a href="/admin/layanan/surat">Surat Menyurat</a>
-                    <a href="/admin/layanan/permohonan">Permohonan</a>
+                <div class="sidebar-submenu" id="submenu-barang">
+                    <a href="/barang/list-barang">List Barang</a>
+                    <a href="/barang/create">Tambah Barang</a>
                 </div>
             </div>
 
@@ -534,8 +533,7 @@
                 <div class="logo">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
                         xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M12 3L2 9v11h20V9L12 3zm0 2.2L19 9v9h-5v-6h-4v6H5V9l7-3.8zM14 18v-4h-4v4h4z" />
+                        <path d="M12 3L2 9v11h20V9L12 3zm0 2.2L19 9v9h-5v-6h-4v6H5V9l7-3.8zM14 18v-4h-4v4h4z" />
                     </svg>
                 </div>
                 <div class="brand-text">
@@ -569,7 +567,6 @@
             // Toggle sidebar
             function toggleSidebar() {
                 document.body.classList.toggle('sidebar-open');
-                // Save state to localStorage
                 const isOpen = document.body.classList.contains('sidebar-open');
                 localStorage.setItem('sidebarOpen', isOpen);
             }
@@ -578,12 +575,18 @@
             function toggleSubmenu(menuId) {
                 const submenu = document.getElementById('submenu-' + menuId);
                 const chevron = document.getElementById('chevron-' + menuId);
+                const toggleButton = document.querySelector('[aria-controls="submenu-' + menuId + '"]');
+
+                if (!submenu || !chevron) return;
+
+                // jika ada atribut hidden (misalnya leftover), hapus supaya CSS max-height bekerja
+                if (submenu.hasAttribute('hidden')) submenu.removeAttribute('hidden');
 
                 submenu.classList.toggle('open');
                 chevron.classList.toggle('open');
 
-                // Save state
                 const isOpen = submenu.classList.contains('open');
+                if (toggleButton) toggleButton.setAttribute('aria-expanded', isOpen);
                 localStorage.setItem('submenu-' + menuId, isOpen);
             }
 
@@ -591,38 +594,45 @@
             window.addEventListener('DOMContentLoaded', function () {
                 // Restore sidebar open/close state
                 const sidebarOpen = localStorage.getItem('sidebarOpen') === 'true';
-                if (sidebarOpen) {
-                    document.body.classList.add('sidebar-open');
-                }
+                if (sidebarOpen) document.body.classList.add('sidebar-open');
 
-                // Restore submenu states
-                ['warga', 'layanan', 'pengumuman', 'keuangan'].forEach(function (menuId) {
+                // Restore submenu states (tambah 'peminjam' di sini)
+                [, 'peminjam', 'barang sewaan', 'pengumuman', 'keuangan'].forEach(function (menuId) {
                     const submenuOpen = localStorage.getItem('submenu-' + menuId) === 'true';
-                    if (submenuOpen) {
-                        const submenu = document.getElementById('submenu-' + menuId);
-                        const chevron = document.getElementById('chevron-' + menuId);
-                        if (submenu && chevron) {
-                            submenu.classList.add('open');
-                            chevron.classList.add('open');
-                        }
+                    const submenu = document.getElementById('submenu-' + menuId);
+                    const chevron = document.getElementById('chevron-' + menuId);
+                    const toggleButton = document.querySelector('[aria-controls="submenu-' + menuId + '"]');
+
+                    if (submenu && chevron && submenuOpen) {
+                        // Pastikan hidden dihapus jika ada
+                        if (submenu.hasAttribute('hidden')) submenu.removeAttribute('hidden');
+                        submenu.classList.add('open');
+                        chevron.classList.add('open');
+                        if (toggleButton) toggleButton.setAttribute('aria-expanded', 'true');
                     }
                 });
 
-                // Auto-open submenu based on current path
+                // Auto-open submenu berdasarkan currentPath (server-side bisa set currentPath)
                 const currentPath = '<%= (typeof currentPath !== "undefined" && currentPath) ? currentPath : "" %>';
                 if (currentPath) {
                     if (currentPath.startsWith('/admin/warga')) {
-                        document.getElementById('submenu-warga').classList.add('open');
-                        document.getElementById('chevron-warga').classList.add('open');
-                    } else if (currentPath.startsWith('/admin/layanan')) {
-                        document.getElementById('submenu-layanan').classList.add('open');
-                        document.getElementById('chevron-layanan').classList.add('open');
+                        const s = document.getElementById('submenu-warga'); if (s) s.classList.add('open');
+                        const c = document.getElementById('chevron-warga'); if (c) c.classList.add('open');
+                    } else if (currentPath.startsWith('/peminjam')) {
+                        const s = document.getElementById('submenu-peminjam'); if (s) {
+                            if (s.hasAttribute('hidden')) s.removeAttribute('hidden');
+                            s.classList.add('open');
+                        }
+                        const c = document.getElementById('chevron-peminjam'); if (c) c.classList.add('open');
+                    } else if (currentPath.startsWith('/barang/list-barang')) {
+                        const s = document.getElementById('submenu-barang'); if (s) s.classList.add('open');
+                        const c = document.getElementById('chevron-barang'); if (c) c.classList.add('open');
                     } else if (currentPath.startsWith('/admin/pengumuman')) {
-                        document.getElementById('submenu-pengumuman').classList.add('open');
-                        document.getElementById('chevron-pengumuman').classList.add('open');
+                        const s = document.getElementById('submenu-pengumuman'); if (s) s.classList.add('open');
+                        const c = document.getElementById('chevron-pengumuman'); if (c) c.classList.add('open');
                     } else if (currentPath.startsWith('/admin/keuangan')) {
-                        document.getElementById('submenu-keuangan').classList.add('open');
-                        document.getElementById('chevron-keuangan').classList.add('open');
+                        const s = document.getElementById('submenu-keuangan'); if (s) s.classList.add('open');
+                        const c = document.getElementById('chevron-keuangan'); if (c) c.classList.add('open');
                     }
                 }
             });

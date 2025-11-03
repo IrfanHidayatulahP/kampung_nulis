@@ -1,0 +1,60 @@
+<%- include('../../partials/header.ejs', { title: 'Edit Peminjam' , currentPath: '/peminjam/edit' , user: user }) %>
+
+    <div class="card">
+        <h2>Edit Peminjam</h2>
+
+        <% if (typeof error !=='undefined' && error) { %>
+            <div style="margin-top:10px;padding:10px;border-radius:8px;background:var(--danger);color:white;">
+                <%= error %>
+            </div>
+            <% } %>
+
+                <form method="POST" action="/peminjam/edit/<%= encodeURIComponent(peminjam.username) %>"
+                    style="margin-top:12px;max-width:700px;">
+                    <label class="small">Username (PK)</label>
+                    <input name="username" value="<%= peminjam.username %>" disabled
+                        style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin-top:6px;background:#f3f4f6;">
+
+                    <label class="small" style="margin-top:10px;display:block">Password (kosongkan jika tidak ingin
+                        mengubah)</label>
+                    <input name="password" type="password" placeholder="Password baru (opsional)"
+                        style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin-top:6px;">
+
+                    <label class="small" style="margin-top:10px;display:block">Nama Lengkap</label>
+                    <input name="nama_lengkap" required value="<%= peminjam.nama_lengkap || '' %>"
+                        placeholder="Nama lengkap"
+                        style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin-top:6px;">
+
+                    <label class="small" style="margin-top:10px;display:block">Alamat</label>
+                    <input name="alamat" value="<%= peminjam.alamat || '' %>" placeholder="Alamat (opsional)"
+                        style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin-top:6px;">
+
+                    <label class="small" style="margin-top:10px;display:block">No. Telepon</label>
+                    <input name="no_telpon" value="<%= peminjam.no_telpon || '' %>" placeholder="08xxxx"
+                        style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin-top:6px;">
+
+                    <label class="small" style="margin-top:10px;display:block">Status</label>
+                    <select name="status" required
+                        style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin-top:6px;">
+                        <option value="">-- Pilih status --</option>
+                        <option value="Admin" <%=peminjam.status==='Admin' ? 'selected' : '' %>>Admin</option>
+                        <option value="Anggota" <%=peminjam.status==='Anggota' ? 'selected' : '' %>>Anggota</option>
+                        <option value="Non-Anggota" <%=peminjam.status==='Non-Anggota' ? 'selected' : '' %>>Non-Anggota
+                        </option>
+                    </select>
+
+                    <label class="small" style="margin-top:10px;display:block">Tanggal Daftar</label>
+                    <input type="date" name="tgl_daftar"
+                        value="<%= peminjam.tgl_daftar ? peminjam.tgl_daftar.substring(0,10) : '' %>" required
+                        style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin-top:6px;">
+
+                    <div style="margin-top:14px;">
+                        <button class="btn" type="submit">Update</button>
+
+                        <a href="/peminjam/list-peminjam" class="btn"
+                            style="background:#6c757d;color:white;padding:8px 10px;border-radius:8px;border:none;margin-left:8px;">Batal</a>
+                    </div>
+                </form>
+    </div>
+
+    <%- include('../../partials/footer.ejs') %>
