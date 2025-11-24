@@ -6,7 +6,7 @@ const isAdmin = require('../middleware/admin');
 // const anggotaAndNonAnggota = require('../middleware/anggotaAndNon-Anggota');
 
 router.get('/list-barang', barangController.showIndex);
-router.get('/create', isAdmin, barangController.showCreateForm);
+router.get('/create', barangController.showCreateForm);
 router.post('/create', barangController.create);
 router.get('/edit/:id', barangController.showEditForm);
 router.post('/edit/:id', barangController.update);
