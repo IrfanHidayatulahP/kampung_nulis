@@ -1,0 +1,64 @@
+<%- include('../../partials/header.ejs') %>
+    <div class="container mt-4">
+        <h2>Tambah Transaksi</h2>
+
+        <% if (error) { %>
+            <div class="alert alert-danger">
+                <%= error %>
+            </div>
+            <% } %>
+
+                <form method="post" action="/transaksi/create">
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <% if (peminjamOptions && peminjamOptions.length) { %>
+                            <select name="username" class="form-control" required>
+                                <% peminjamOptions.forEach(p=> { %>
+                                    <option value="<%= p.username %>">
+                                        <%= p.username %> - <%= p.nama_lengkap || '' %>
+                                    </option>
+                                    <% }) %>
+                            </select>
+                            <% } else { %>
+                                <input type="text" name="username" class="form-control" required>
+                                <% } %>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Tanggal Sewa</label>
+                            <input type="date" name="tgl_sewa" class="form-control" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Tanggal Pengembalian</label>
+                            <input type="date" name="tgl_pengembalian" class="form-control">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Status</label>
+                            <select name="status_transaksi" class="form-control" required>
+                                <% statusOptions.forEach(s=> { %>
+                                    <option value="<%= s %>">
+                                        <%= s %>
+                                    </option>
+                                    <% }) %>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Total Biaya Sewa</label>
+                        <input type="number" name="total_biaya_sewa" class="form-control" min="0" value="0">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Total DP</label>
+                        <input type="number" name="total_dp" class="form-control" min="0" value="0">
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success">Simpan</button>
+                        <a href="/transaksi/list-transaksi" class="btn btn-secondary">Batal</a>
+                    </div>
+                </form>
+    </div>
+    <%- include('../../partials/footer.ejs') %>

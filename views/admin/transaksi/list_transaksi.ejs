@@ -1,0 +1,76 @@
+<%- include('../../partials/header.ejs') %>
+    <div class="container mt-4">
+        <h2>Daftar Transaksi Sewa</h2>
+
+        <form class="mb-3" method="get" action="/transaksi/list-transaksi">
+            <div class="input-group">
+                <input name="q" value="<%= filter_q || '' %>" class="form-control"
+                    placeholder="Cari id / username / status">
+                <button class="btn btn-primary">Cari</button>
+            </div>
+        </form>
+
+        <% if (success) { %>
+            <div class="alert alert-success">
+                <%= success %>
+            </div>
+            <% } %>
+                <% if (error) { %>
+                    <div class="alert alert-danger">
+                        <%= error %>
+                    </div>
+                    <% } %>
+
+                        <a href="/transaksi/create" class="btn btn-success mb-3">Tambah Transaksi</a>
+
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Username</th>
+                                    <th>Tgl Sewa</th>
+                                    <th>Tgl Kembali</th>
+                                    <th>Status</th>
+                                    <th>Total</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% records.forEach(r=> { %>
+                                    <tr>
+                                        <td>
+                                            <%= r.id_transaksi %>
+                                        </td>
+                                        <td>
+                                            <%= r.username %>
+                                        </td>
+                                        <td>
+                                            <%= r.tgl_sewa %>
+                                        </td>
+                                        <td>
+                                            <%= r.tgl_pengembalian || '-' %>
+                                        </td>
+                                        <td>
+                                            <%= r.status_transaksi %>
+                                        </td>
+                                        <td>
+                                            <%= (r.total_biaya_sewa || 0).toLocaleString('id-ID', { style: 'currency' ,
+                                                currency: 'IDR' , minimumFractionDigits: 0, maximumFractionDigits: 0 })
+                                                %>
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-sm btn-info"
+                                                href="/transaksi/detail/<%= r.id_transaksi %>">Detail</a>
+                                            <a class="btn btn-sm btn-warning"
+                                                href="/transaksi/edit/<%= r.id_transaksi %>">Edit</a>
+                                            <form action="/transaksi/delete/<%= r.id_transaksi %>" method="post"
+                                                style="display:inline" onsubmit="return confirm('Hapus?')">
+                                                <button class="btn btn-sm btn-danger">Hapus</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
+                        </table>
+    </div>
+    <%- include('../../partials/footer.ejs') %>

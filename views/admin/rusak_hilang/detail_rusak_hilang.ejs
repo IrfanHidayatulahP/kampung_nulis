@@ -1,0 +1,67 @@
+<%- include('../../partials/header.ejs') %>
+
+    <div class="container mt-4">
+        <h2>Detail Rusak/Hilang — ID #<%= rusak_hilang.id_rusak_hilang %>
+        </h2>
+
+        <div class="card">
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3">Nama Barang</dt>
+                    <dd class="col-sm-9">
+                        <%= rusak_hilang.nama_barang || '-' %>
+                    </dd>
+
+                    <dt class="col-sm-3">ID Detail</dt>
+                    <dd class="col-sm-9">
+                        <%= rusak_hilang.id_detail %>
+                    </dd>
+
+                    <dt class="col-sm-3">Jumlah Rusak</dt>
+                    <dd class="col-sm-9">
+                        <%= rusak_hilang.jumlah_rusak || 0 %>
+                    </dd>
+
+                    <dt class="col-sm-3">Jumlah Hilang</dt>
+                    <dd class="col-sm-9">
+                        <%= rusak_hilang.jumlah_hilang || 0 %>
+                    </dd>
+
+                    <dt class="col-sm-3">Biaya Denda / Item</dt>
+                    <dd class="col-sm-9">
+                        Rp <%= (rusak_hilang.biaya_denda_per_item || 0).toLocaleString('id-ID') %>
+                            <% if (rusak_hilang._biaya_source) { %>
+                                <small class="text-muted"> (sumber: <%= rusak_hilang._biaya_source %>)</small>
+                                <% } %>
+                    </dd>
+
+                    <dt class="col-sm-3">Subtotal Denda</dt>
+                    <dd class="col-sm-9">
+                        Rp <%= (rusak_hilang.subtotal_denda || rusak_hilang.subtotal_denda_computed ||
+                            0).toLocaleString('id-ID') %>
+                            <% if (Number(rusak_hilang.subtotal_denda || 0)
+                                !==Number(rusak_hilang.subtotal_denda_computed || 0)) { %>
+                                <div class="small text-muted">Tersimpan: Rp <%= (rusak_hilang.subtotal_denda ||
+                                        0).toLocaleString('id-ID') %>, Dihitung ulang: Rp <%=
+                                            (rusak_hilang.subtotal_denda_computed || 0).toLocaleString('id-ID') %>
+                                </div>
+                                <% } %>
+                    </dd>
+
+                </dl>
+
+                <% if (user && (user.status==='Admin' || (user.role && user.role.toLowerCase()==='admin' ))) { %>
+                    <a href="/rusak-hilang/edit/<%= rusak_hilang.id_rusak_hilang %>" class="btn btn-warning">Edit</a>
+
+                    <form action="/rusak-hilang/delete/<%= rusak_hilang.id_rusak_hilang %>" method="post"
+                        style="display:inline" onsubmit="return confirm('Hapus data ini?')">
+                        <button type="submit" class="btn btn-danger">Hapus</button>
+                    </form>
+                    <% } %>
+
+                        <a href="/rusak-hilang/list" class="btn btn-secondary">Kembali</a>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../../partials/footer.ejs') %>

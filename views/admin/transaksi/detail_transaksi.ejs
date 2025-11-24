@@ -1,0 +1,53 @@
+<%- include('../../partials/header.ejs') %>
+    <div class="container mt-4">
+        <h2>Detail Transaksi #<%= transaksi.id_transaksi %>
+        </h2>
+
+        <div class="card">
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3">Username</dt>
+                    <dd class="col-sm-9">
+                        <%= transaksi.username %>
+                    </dd>
+
+                    <dt class="col-sm-3">Tanggal Sewa</dt>
+                    <dd class="col-sm-9">
+                        <%= transaksi.tgl_sewa %>
+                    </dd>
+
+                    <dt class="col-sm-3">Tanggal Pengembalian</dt>
+                    <dd class="col-sm-9">
+                        <%= transaksi.tgl_pengembalian || '-' %>
+                    </dd>
+
+                    <dt class="col-sm-3">Status</dt>
+                    <dd class="col-sm-9">
+                        <%= transaksi.status_transaksi %>
+                    </dd>
+
+                    <dt class="col-sm-3">Total Biaya Sewa</dt>
+                    <dd class="col-sm-9">
+                        Rp <%= (transaksi.total_biaya_sewa || 0).toLocaleString('id-ID', { minimumFractionDigits: 0,
+                            maximumFractionDigits: 0 }) %>
+                    </dd>
+
+                    <dt class="col-sm-3">Total DP</dt>
+                    <dd class="col-sm-9">
+                        Rp <%= (transaksi.total_dp || 0).toLocaleString('id-ID', { minimumFractionDigits: 0,
+                            maximumFractionDigits: 0 }) %>
+                    </dd>
+                </dl>
+
+                <a href="/transaksi/edit/<%= transaksi.id_transaksi %>" class="btn btn-warning">Edit</a>
+
+                <form action="/transaksi/delete/<%= transaksi.id_transaksi %>" method="post" style="display:inline"
+                    onsubmit="return confirm('Hapus transaksi ini?');">
+                    <button class="btn btn-danger">Hapus</button>
+                </form>
+
+                <a href="/transaksi/list-transaksi" class="btn btn-secondary">Kembali</a>
+            </div>
+        </div>
+    </div>
+    <%- include('../../partials/footer.ejs') %>

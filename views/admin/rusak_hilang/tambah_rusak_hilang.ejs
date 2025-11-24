@@ -1,0 +1,138 @@
+<%- include('../../partials/header.ejs') %>
+
+    <div class="container mt-4">
+        <h2>Tambah Rusak / Hilang</h2>
+
+        <% if (typeof error !=='undefined' && error) { %>
+            <div class="alert alert-danger">
+                <%= error %>
+            </div>
+            <% } %>
+                <% if (typeof success !=='undefined' && success) { %>
+                    <div class="alert alert-success">
+                        <%= success %>
+                    </div>
+                    <% } %>
+
+                        <form id="form-rusak-hilang" method="post" action="/rusak-hilang/create">
+                            <div class="mb-3">
+                                <label class="form-label">ID Detail (transaksi)</label>
+                                <select id="select-id-detail" name="id_detail" class="form-control" required>
+                                    <option value="">-- Pilih ID Detail --</option>
+                                    <% if (detailOptions && detailOptions.length) { %>
+                                        <% detailOptions.forEach(function(d) { const id_detail=d.id_detail; const
+                                            id_barang=(typeof d.id_barang !=='undefined' ) ? d.id_barang : (d.idBarang
+                                            || '' ); const nama_barang=(typeof d.nama_barang !=='undefined' ) ?
+                                            d.nama_barang : (d.namaBarang || '' ); const harga_ganti=(typeof
+                                            d.harga_ganti_barang !=='undefined' ) ? d.harga_ganti_barang :
+                                            (d.hargaGantiBarang || '' ); %>
+                                            <option value="<%= id_detail %>" data-id-barang="<%= id_barang %>"
+                                                data-nama-barang="<%= nama_barang %>" data-harga="<%= harga_ganti %>">
+                                                <%= id_detail %> — transaksi: <%= d.id_transaksi || '-' %>
+                                                        <%= id_barang ? (' | barang: '+ id_barang) : '' %>
+            </option>
+          <% }) %>
+        <% } else { %>
+          <option value="">(tidak ada pilihan)</option>
+        <% } %>
+      </select>
+      <small class="form-text text-muted">Biaya denda akan ditentukan otomatis berdasarkan barang pengganti (jika tersedia) atau harga dasar sewa barang. Anda dapat mengubah biaya secara manual jika diperlukan.</small>
+    </div>
+
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Nama Barang</label>
+        <!-- Diisi otomatis bila tersedia, admin boleh ubah bila perlu -->
+        <input type="text" id="input-nama-barang" class="form-control" name="nama_barang" placeholder="Nama barang (otomatis jika tersedia)">
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Jumlah Rusak</label>
+        <input type="number" id="input-jumlah-rusak" name="jumlah_rusak" class="form-control" min="0" value="0">
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Jumlah Hilang</label>
+        <input type="number" id="input-jumlah-hilang" name="jumlah_hilang" class="form-control" min="0" value="0">
+      </div>
+    </div>
+
+    <div class="row align-items-end">
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Biaya Denda per Item (Rp)</label>
+        <!-- biayanya bisa otomatis diisi, admin juga bisa override -->
+        <input type="number" id="input-biaya" name="biaya_denda_per_item" class="form-control" min="0" step="1" value="0">
+        <small class="form-text text-muted">Jika kosong/0, server akan mencoba menentukan biaya berdasarkan data barang pengganti atau harga dasar sewa.</small>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Subtotal Denda (otomatis)</label>
+        <input type="text" id="display-subtotal" class="form-control" readonly value="Rp 0">
+      </div>
+
+      <div class="col-md-4 mb-3 text-end">
+        <label class="form-label d-block">&nbsp;</label>
+        <div>
+          <button type="submit" class="btn btn-success">Simpan</button>
+          <a href="/rusak-hilang/list" class="btn btn-secondary">Batal</a>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+    (function () {
+        // util: format number ke "Rp x.xxx"
+        function formatRupiah(num) {
+            if (!Number.isFinite(num)) return ' Rp 0'; return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR', maximumFractionDigits: 0
+            }).format(num);
+        }
+        const
+            selectDetail = document.getElementById('select-id-detail');
+        const
+            inputNama = document.getElementById('input-nama-barang');
+        const
+            inputJumlahRusak = document.getElementById('input-jumlah-rusak');
+        const
+            inputJumlahHilang = document.getElementById('input-jumlah-hilang');
+        const inputBiaya = document.getElementById('input-biaya');
+        const
+            displaySubtotal = document.getElementById('display-subtotal');
+        function computeAndShowSubtotal() {
+            const
+            jr = Number(inputJumlahRusak.value) || 0; const
+                jh = Number(inputJumlahHilang.value) || 0; const
+                    biaya = Number(inputBiaya.value) || 0; const
+                        subtotal = Math.max(0, (jr + jh) * biaya);
+            displaySubtotal.value = formatRupiah(subtotal);
+        } if
+            (selectDetail) {
+                selectDetail.addEventListener('change',
+                    function (e) {
+                        const opt = selectDetail.selectedOptions &&
+                            selectDetail.selectedOptions[0]; if (!opt) return; const
+                                nama = opt.getAttribute('data-nama-barang') || ''; const
+                                    hargaFromOption = opt.getAttribute('data-harga'); if (nama)
+                            inputNama.value = nama; if (!nama) inputNama.value = ''; if
+                            (hargaFromOption !== null && hargaFromOption !== '') {
+                                const
+                                h = Number(hargaFromOption); if (Number.isFinite(h))
+                                inputBiaya.value = h;
+                        } // rekalkulasi subtotal
+                        computeAndShowSubtotal();
+                    });
+        } [inputJumlahRusak,
+            inputJumlahHilang, inputBiaya].forEach(el => {
+                if (!el) return;
+                el.addEventListener('input', computeAndShowSubtotal);
+            });
+
+        // inisialisasi tampilan berdasarkan default values
+        computeAndShowSubtotal();
+    })();
+</script>
+
+                                                            <%- include('../../partials/footer.ejs') %>

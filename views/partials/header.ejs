@@ -48,7 +48,6 @@
             padding: 0 20px;
         }
 
-        /* Top Header */
         .appbar {
             height: var(--nav-height);
             display: flex;
@@ -121,6 +120,17 @@
             font-weight: 600;
         }
 
+        .user-status {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
         .btn {
             display: inline-block;
             padding: 10px 18px;
@@ -166,7 +176,6 @@
             background: #b91c1c;
         }
 
-        /* Sidebar Styles */
         .sidebar {
             position: fixed;
             left: calc(-1 * var(--sidebar-width));
@@ -322,7 +331,6 @@
             transform: rotate(180deg);
         }
 
-        /* Toggle Button */
         .sidebar-toggle {
             background: rgba(255, 255, 255, 0.2);
             border: 2px solid rgba(255, 255, 255, 0.3);
@@ -343,7 +351,6 @@
             border-color: rgba(255, 255, 255, 0.5);
         }
 
-        /* Overlay */
         .sidebar-overlay {
             position: fixed;
             top: 0;
@@ -362,12 +369,10 @@
             visibility: visible;
         }
 
-        /* Content Spacing */
         .page-content {
             padding-top: calc(var(--nav-height) + 24px);
         }
 
-        /* Card Styles */
         .card {
             background: white;
             border-radius: var(--radius);
@@ -385,7 +390,6 @@
             color: var(--muted);
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             body.sidebar-open {
                 padding-left: 0;
@@ -449,72 +453,149 @@
         </div>
 
         <nav class="sidebar-menu">
-            <!-- Dashboard -->
-            <div class="sidebar-menu-item">
-                <a href="/admin/dashboard_admin">
-                    <span>🏠 Dashboard</span>
-                </a>
-            </div>
+            <!-- Dashboard (Untuk semua user) -->
+            <% // fallback jika user tidak tersedia -> arahkan ke /login
+                let dashboardRoute = '/login';
+                if (typeof user !== 'undefined' && user) {
+                if (user.status === 'Admin') {
+                dashboardRoute = '/admin/dashboard_admin';
+                } else if (user.status === 'Anggota') {
+                dashboardRoute = '/anggota/dashboard_anggota';
+                } else if (user.status === 'Non-Anggota') {
+                dashboardRoute = '/nonanggota/dashboard_nonanggota';
+                }
+                }
+                %>
 
-            <!-- Manajemen Peminjam -->
-            <div class="sidebar-menu-item">
-                <button onclick="toggleSubmenu('peminjam')" aria-expanded="false" aria-controls="submenu-peminjam">
-                    <span>👥 Manajemen Peminjam</span>
-                    <span class="chevron" id="chevron-peminjam">▼</span>
-                </button>
-
-                <div class="sidebar-submenu" id="submenu-peminjam">
-                    <a class="sidebar-link" href="/peminjam/list-peminjam">Daftar Peminjam</a>
-                    <a class="sidebar-link" href="/peminjam/create">Tambah Peminjam</a>
-                    <a class="sidebar-link" href="/peminjam/import">Import Data</a>
+                <div class="sidebar-menu-item">
+                    <a href="<%= dashboardRoute %>">
+                        <span>🏠 Dashboard</span>
+                    </a>
                 </div>
-            </div>
 
-            <!-- Barang Sewaan -->
-            <div class="sidebar-menu-item">
-                <button onclick="toggleSubmenu('barang')">
-                    <span>📋  Barang Sewaan</span>
-                    <span class="chevron" id="chevron-barang">▼</span>
-                </button>
-                <div class="sidebar-submenu" id="submenu-barang">
-                    <a href="/barang/list-barang">List Barang</a>
-                    <a href="/barang/create">Tambah Barang</a>
-                </div>
-            </div>
 
-            <!-- Pengumuman -->
-            <div class="sidebar-menu-item">
-                <button onclick="toggleSubmenu('pengumuman')">
-                    <span>📢 Pengumuman</span>
-                    <span class="chevron" id="chevron-pengumuman">▼</span>
-                </button>
-                <div class="sidebar-submenu" id="submenu-pengumuman">
-                    <a href="/admin/pengumuman">Daftar Pengumuman</a>
-                    <a href="/admin/pengumuman/create">Buat Pengumuman</a>
-                    <a href="/admin/pengumuman/kategori">Kategori</a>
-                </div>
-            </div>
+                <!-- Menu untuk ADMIN -->
+                <% if (typeof user !=='undefined' && user && user.status==='Admin' ) { %>
+                    <!-- Manajemen Peminjam -->
+                    <div class="sidebar-menu-item">
+                        <button onclick="toggleSubmenu('peminjam')" aria-expanded="false"
+                            aria-controls="submenu-peminjam">
+                            <span>👥 Manajemen Peminjam</span>
+                            <span class="chevron" id="chevron-peminjam">▼</span>
+                        </button>
+                        <div class="sidebar-submenu" id="submenu-peminjam">
+                            <a href="/peminjam/list-peminjam">Daftar Peminjam</a>
+                            <a href="/peminjam/create">Tambah Peminjam</a>
+                            <a href="/peminjam/import">Import Data</a>
+                        </div>
+                    </div>
 
-            <!-- Keuangan -->
-            <div class="sidebar-menu-item">
-                <button onclick="toggleSubmenu('keuangan')">
-                    <span>💰 Keuangan Desa</span>
-                    <span class="chevron" id="chevron-keuangan">▼</span>
-                </button>
-                <div class="sidebar-submenu" id="submenu-keuangan">
-                    <a href="/admin/keuangan">Dashboard Keuangan</a>
-                    <a href="/admin/keuangan/pemasukan">Pemasukan</a>
-                    <a href="/admin/keuangan/pengeluaran">Pengeluaran</a>
-                    <a href="/admin/keuangan/laporan">Laporan</a>
-                </div>
-            </div>
+                    <!-- Barang Sewaan -->
+                    <div class="sidebar-menu-item">
+                        <button onclick="toggleSubmenu('barang')" aria-expanded="false" aria-controls="submenu-barang">
+                            <span>📋 Barang Sewaan</span>
+                            <span class="chevron" id="chevron-barang">▼</span>
+                        </button>
+                        <div class="sidebar-submenu" id="submenu-barang">
+                            <a href="/barang/list-barang">List Barang</a>
+                            <a href="/barang/create">Tambah Barang</a>
+                        </div>
+                    </div>
 
-            <!-- Pengaturan -->
-            <div class="sidebar-menu-item">
-                <a href="/admin/settings">
-                    <span>⚙️ Pengaturan</span>
-                </a>
-            </div>
+                    <!-- Transaksi Sewa -->
+                    <div class="sidebar-menu-item">
+                        <button onclick="toggleSubmenu('transaksi-sewa')" aria-expanded="false"
+                            aria-controls="submenu-transaksi-sewa">
+                            <span>📢 Transaksi Sewa</span>
+                            <span class="chevron" id="chevron-transaksi-sewa">▼</span>
+                        </button>
+                        <div class="sidebar-submenu" id="submenu-transaksi-sewa">
+                            <a href="/transaksi/list-transaksi">Daftar Transaksi</a>
+                            <a href="/transaksi/create">Buat Transaksi</a>
+                        </div>
+                    </div>
+
+                    <!-- Detail Transaksi -->
+                    <div class="sidebar-menu-item">
+                        <button onclick="toggleSubmenu('detail-transaksi')" aria-expanded="false"
+                            aria-controls="submenu-detail-transaksi">
+                            <span>💰 Detail Transaksi</span>
+                            <span class="chevron" id="chevron-detail-transaksi">▼</span>
+                        </button>
+                        <div class="sidebar-submenu" id="submenu-detail-transaksi">
+                            <a href="/detail-transaksi/list-detail">List Detail Transaksi</a>
+                            <a href="/detail-transaksi/create">Tambah Detail Transaksi</a>
+                        </div>
+                    </div>
+
+                    <!-- Rusak / Hilang -->
+                    <div class="sidebar-menu-item">
+                        <button onclick="toggleSubmenu('rusak-hilang')" aria-expanded="false"
+                            aria-controls="submenu-rusak-hilang">
+                            <span>🧰 Rusak / Hilang</span>
+                            <span class="chevron" id="chevron-rusak-hilang">▼</span>
+                        </button>
+                        <div class="sidebar-submenu" id="submenu-rusak-hilang">
+                            <a href="/rusak-hilang/list">List Rusak / Hilang</a>
+                            <a href="/rusak-hilang/create">Tambah Rusak / Hilang</a>
+                        </div>
+                    </div>
+
+                    <% } %>
+
+                        <!-- Menu untuk ANGGOTA -->
+                        <% if (typeof user !=='undefined' && user && user.status==='Anggota' ) { %>
+                            <!-- Barang Sewaan (View only) -->
+                            <div class="sidebar-menu-item">
+                                <a href="/barang/list-barang">
+                                    <span>📋 Daftar Barang</span>
+                                </a>
+                            </div>
+
+                            <!-- Transaksi Sewa Saya -->
+                            <div class="sidebar-menu-item">
+                                <button onclick="toggleSubmenu('transaksi-saya')" aria-expanded="false"
+                                    aria-controls="submenu-transaksi-saya">
+                                    <span>📢 Transaksi Saya</span>
+                                    <span class="chevron" id="chevron-transaksi-saya">▼</span>
+                                </button>
+                                <div class="sidebar-submenu" id="submenu-transaksi-saya">
+                                    <a href="/transaksi/my-transaksi">Riwayat Transaksi</a>
+                                    <a href="/transaksi/create">Buat Pemesanan</a>
+                                </div>
+                            </div>
+
+                            <!-- Profil Saya -->
+                            <div class="sidebar-menu-item">
+                                <a href="/profile">
+                                    <span>👤 Profil Saya</span>
+                                </a>
+                            </div>
+                            <% } %>
+
+                                <!-- Menu untuk NON-ANGGOTA -->
+                                <% if (typeof user !=='undefined' && user && user.status==='Non-Anggota' ) { %>
+                                    <!-- Barang Sewaan (View only) -->
+                                    <div class="sidebar-menu-item">
+                                        <a href="/barang/list-barang">
+                                            <span>📋 Daftar Barang</span>
+                                        </a>
+                                    </div>
+
+                                    <!-- Info Pengajuan -->
+                                    <div class="sidebar-menu-item">
+                                        <a href="/membership/info">
+                                            <span>ℹ️ Info Keanggotaan</span>
+                                        </a>
+                                    </div>
+
+                                    <!-- Profil -->
+                                    <div class="sidebar-menu-item">
+                                        <a href="/profile">
+                                            <span>👤 Profil</span>
+                                        </a>
+                                    </div>
+                                    <% } %>
         </nav>
     </aside>
 
@@ -548,9 +629,14 @@
         <!-- right actions -->
         <div class="right-actions">
             <% if (typeof user !=='undefined' && user) { %>
-                <div class="user-greeting">Halo, <strong>
+                <div class="user-greeting">
+                    Halo, <strong>
                         <%= user.nama_lengkap || user.username %>
-                    </strong></div>
+                    </strong>
+                    <span class="user-status">
+                        <%= user.status %>
+                    </span>
+                </div>
                 <a href="/profile" class="btn-ghost">Profil</a>
                 <a href="/logout" class="btn btn-logout">Keluar</a>
                 <% } else { %>
@@ -564,14 +650,12 @@
     <div class="container page-content">
 
         <script>
-            // Toggle sidebar
             function toggleSidebar() {
                 document.body.classList.toggle('sidebar-open');
                 const isOpen = document.body.classList.contains('sidebar-open');
                 localStorage.setItem('sidebarOpen', isOpen);
             }
 
-            // Toggle submenu
             function toggleSubmenu(menuId) {
                 const submenu = document.getElementById('submenu-' + menuId);
                 const chevron = document.getElementById('chevron-' + menuId);
@@ -579,7 +663,6 @@
 
                 if (!submenu || !chevron) return;
 
-                // jika ada atribut hidden (misalnya leftover), hapus supaya CSS max-height bekerja
                 if (submenu.hasAttribute('hidden')) submenu.removeAttribute('hidden');
 
                 submenu.classList.toggle('open');
@@ -590,50 +673,23 @@
                 localStorage.setItem('submenu-' + menuId, isOpen);
             }
 
-            // Restore sidebar state on page load
             window.addEventListener('DOMContentLoaded', function () {
-                // Restore sidebar open/close state
                 const sidebarOpen = localStorage.getItem('sidebarOpen') === 'true';
                 if (sidebarOpen) document.body.classList.add('sidebar-open');
 
-                // Restore submenu states (tambah 'peminjam' di sini)
-                [, 'peminjam', 'barang sewaan', 'pengumuman', 'keuangan'].forEach(function (menuId) {
+                // Restore submenu states
+                ['peminjam', 'barang', 'transaksi-sewa', 'detail-transaksi', 'transaksi-saya'].forEach(function (menuId) {
                     const submenuOpen = localStorage.getItem('submenu-' + menuId) === 'true';
                     const submenu = document.getElementById('submenu-' + menuId);
                     const chevron = document.getElementById('chevron-' + menuId);
                     const toggleButton = document.querySelector('[aria-controls="submenu-' + menuId + '"]');
 
                     if (submenu && chevron && submenuOpen) {
-                        // Pastikan hidden dihapus jika ada
                         if (submenu.hasAttribute('hidden')) submenu.removeAttribute('hidden');
                         submenu.classList.add('open');
                         chevron.classList.add('open');
                         if (toggleButton) toggleButton.setAttribute('aria-expanded', 'true');
                     }
                 });
-
-                // Auto-open submenu berdasarkan currentPath (server-side bisa set currentPath)
-                const currentPath = '<%= (typeof currentPath !== "undefined" && currentPath) ? currentPath : "" %>';
-                if (currentPath) {
-                    if (currentPath.startsWith('/admin/warga')) {
-                        const s = document.getElementById('submenu-warga'); if (s) s.classList.add('open');
-                        const c = document.getElementById('chevron-warga'); if (c) c.classList.add('open');
-                    } else if (currentPath.startsWith('/peminjam')) {
-                        const s = document.getElementById('submenu-peminjam'); if (s) {
-                            if (s.hasAttribute('hidden')) s.removeAttribute('hidden');
-                            s.classList.add('open');
-                        }
-                        const c = document.getElementById('chevron-peminjam'); if (c) c.classList.add('open');
-                    } else if (currentPath.startsWith('/barang/list-barang')) {
-                        const s = document.getElementById('submenu-barang'); if (s) s.classList.add('open');
-                        const c = document.getElementById('chevron-barang'); if (c) c.classList.add('open');
-                    } else if (currentPath.startsWith('/admin/pengumuman')) {
-                        const s = document.getElementById('submenu-pengumuman'); if (s) s.classList.add('open');
-                        const c = document.getElementById('chevron-pengumuman'); if (c) c.classList.add('open');
-                    } else if (currentPath.startsWith('/admin/keuangan')) {
-                        const s = document.getElementById('submenu-keuangan'); if (s) s.classList.add('open');
-                        const c = document.getElementById('chevron-keuangan'); if (c) c.classList.add('open');
-                    }
-                }
             });
         </script>

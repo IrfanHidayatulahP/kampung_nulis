@@ -1,0 +1,72 @@
+<%- include('../../partials/header.ejs') %>
+    <div class="container mt-4">
+        <h2>Daftar Detail Transaksi</h2>
+
+        <form class="mb-3" method="get" action="/detail-transaksi/list-detail">
+            <div class="input-group">
+                <input name="q" value="<%= filter_q || '' %>" class="form-control"
+                    placeholder="Cari id_detail / id_transaksi / id_barang">
+                <button class="btn btn-primary">Cari</button>
+            </div>
+        </form>
+
+        <% if (success) { %>
+            <div class="alert alert-success">
+                <%= success %>
+            </div>
+            <% } %>
+                <% if (error) { %>
+                    <div class="alert alert-danger">
+                        <%= error %>
+                    </div>
+                    <% } %>
+
+                        <a href="/detail-transaksi/create" class="btn btn-success mb-3">Tambah Detail</a>
+
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>ID Transaksi</th>
+                                    <th>ID Barang</th>
+                                    <th>Jumlah</th>
+                                    <th>Harga/Satuan</th>
+                                    <th>Total</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% records.forEach(r=> { %>
+                                    <tr>
+                                        <td>
+                                            <%= r.id_detail %>
+                                        </td>
+                                        <td>
+                                            <%= r.id_transaksi %>
+                                        </td>
+                                        <td>
+                                            <%= r.id_barang %>
+                                        </td>
+                                        <td>
+                                            <%= r.jumlah_sewa %>
+                                        </td>
+                                        <td>Rp <%= (r.harga_sewa_per_satuan || 0).toLocaleString() %>
+                                        </td>
+                                        <td>Rp <%= (r.total_harga_sewa || 0).toLocaleString() %>
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-sm btn-info"
+                                                href="/detail-transaksi/detail/<%= r.id_detail %>">Detail</a>
+                                            <a class="btn btn-sm btn-warning"
+                                                href="/detail-transaksi/edit/<%= r.id_detail %>">Edit</a>
+                                            <form action="/detail-transaksi/delete/<%= r.id_detail %>" method="post"
+                                                style="display:inline" onsubmit="return confirm('Hapus?')">
+                                                <button class="btn btn-sm btn-danger">Hapus</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
+                        </table>
+    </div>
+    <%- include('../../partials/footer.ejs') %>

@@ -1,11 +1,13 @@
 <%- include('../../partials/header.ejs') %>
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Daftar Barang</h2>
-        <div>
-            <a href="/barang/create" class="btn btn-primary">Tambah Barang</a>
-        </div>
-    </div>
 
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Daftar Rusak / Hilang</h2>
+        <% if (user && (user.status==='Admin' || (user.role && user.role.toLowerCase()==='admin' ))) { %>
+            <div>
+                <a href="/rusak-hilang/create" class="btn btn-primary">Tambah</a>
+            </div>
+            <% } %>
+    </div>
 
     <% if (typeof error !=='undefined' && error) { %>
         <div class="alert alert-danger">
@@ -18,15 +20,14 @@
                 </div>
                 <% } %>
 
-
-                    <form class="mb-3" method="get" action="/barang/list-barang">
+                    <form class="mb-3" method="get" action="/rusak-hilang/list">
                         <div class="input-group">
-                            <input type="text" name="q" class="form-control" placeholder="Cari nama atau id..."
+                            <input type="text" name="q" class="form-control"
+                                placeholder="Cari nama barang, ID rusak/hilang atau id_detail..."
                                 value="<%= filter_q || '' %>">
                             <button class="btn btn-outline-secondary" type="submit">Cari</button>
                         </div>
                     </form>
-
 
                     <div class="table-responsive">
                         <table class="table table-bordered table-hover">
@@ -34,44 +35,50 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Nama Barang</th>
-                                    <th>Jumlah Total</th>
-                                    <th>Stok Tersedia</th>
-                                    <th>Satuan</th>
-                                    <th>Harga Sewa</th>
+                                    <th>Jumlah Rusak</th>
+                                    <th>Jumlah Hilang</th>
+                                    <th>Biaya Denda / Item</th>
+                                    <th>Subtotal Denda</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <% if (records && records.length) { %>
-                                    <% records.forEach(function(b) { %>
+                                    <% records.forEach(function(r) { %>
                                         <tr>
                                             <td>
-                                                <%= b.id_barang %>
+                                                <%= r.id_rusak_hilang %>
                                             </td>
                                             <td>
-                                                <%= b.nama_barang %>
+                                                <%= r.nama_barang || '-' %>
+                                            </td>
+
+                                            <td>
+                                                <%= r.jumlah_rusak || 0 %>
                                             </td>
                                             <td>
-                                                <%= b.jumlah_total %>
+                                                <%= r.jumlah_hilang || 0 %>
                                             </td>
+                                            <td>Rp <%= (r.biaya_denda_per_item || 0).toLocaleString('id-ID') %>
+                                            </td>
+                                            <td>Rp <%= (r.subtotal_denda || 0).toLocaleString('id-ID') %>
+                                            </td>
+
                                             <td>
-                                                <%= b.stok_tersedia %>
-                                            </td>
-                                            <td>
-                                                <%= b.satuan_jumlah || '-' %>
-                                            </td>
-                                            <td>Rp <%= (b.harga_dasar_sewa || 0).toLocaleString() %>
-                                            </td>
-                                            <td>
-                                                <a href="/barang/detail/<%= b.id_barang %>"
+                                                <a href="/rusak-hilang/detail/<%= r.id_rusak_hilang %>"
                                                     class="btn btn-sm btn-info">Detail</a>
-                                                <a href="/barang/edit/<%= b.id_barang %>"
-                                                    class="btn btn-sm btn-warning">Edit</a>
-                                                <form action="/barang/delete/<%= b.id_barang %>" method="post"
-                                                    style="display:inline"
-                                                    onsubmit="return confirm('Hapus barang ini?');">
-                                                    <button class="btn btn-sm btn-danger">Hapus</button>
-                                                </form>
+
+                                                <% if (user && (user.status==='Admin' || (user.role &&
+                                                    user.role.toLowerCase()==='admin' ))) { %>
+                                                    <a href="/rusak-hilang/edit/<%= r.id_rusak_hilang %>"
+                                                        class="btn btn-sm btn-warning">Edit</a>
+
+                                                    <form action="/rusak-hilang/delete/<%= r.id_rusak_hilang %>"
+                                                        method="post" style="display:inline;"
+                                                        onsubmit="return confirm('Yakin ingin menghapus data ini?');">
+                                                        <button class="btn btn-sm btn-danger">Hapus</button>
+                                                    </form>
+                                                    <% } %>
                                             </td>
                                         </tr>
                                         <% }) %>
@@ -83,7 +90,5 @@
                             </tbody>
                         </table>
                     </div>
-                    </div>
-
 
                     <%- include('../../partials/footer.ejs') %>
