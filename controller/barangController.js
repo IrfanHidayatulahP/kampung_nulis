@@ -98,7 +98,7 @@ exports.showIndex = async (req, res) => {
         return res.render("admin/barang/list_barang", {
             records: recordsPlain,
             barang: recordsPlain,
-            user,
+            user: req.user,
             nama_lengkap,
             filter_q: q,
             error: req.query.error || null,
