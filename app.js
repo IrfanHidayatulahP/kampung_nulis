@@ -11,6 +11,7 @@ const barangRoutes = require('./routes/barangRoutes');
 const transaksiSewaRoutes = require('./routes/transaksiSewaRoutes');
 const detailTransaksiRoutes = require('./routes/detailTransaksiRoutes');
 const rusakHilangRoutes = require('./routes/rusakHilangRoutes');
+const sewaRoutes = require('./routes/sewaRoutes');
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use('/barang', barangRoutes);
 app.use('/transaksi', transaksiSewaRoutes);
 app.use('/detail-transaksi', detailTransaksiRoutes);
 app.use('/rusak-hilang', rusakHilangRoutes);
+app.use('/sewa', sewaRoutes);
 
 // 404 handler
 app.use((req, res, next) => {

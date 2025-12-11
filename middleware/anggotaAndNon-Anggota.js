@@ -20,7 +20,7 @@ module.exports = async function (req, res, next) {
     const roleNorm = normalizeRole(user.role || user.status || '');
 
     // boleh jika anggota OR non-anggota
-    const allowed = ['anggota', 'nonanggota'];
+    const allowed = ['Anggota', 'Non-Anggota'];
 
     if (!allowed.includes(roleNorm)) {
         return res.status(403).send('Akses ditolak. Halaman ini hanya untuk anggota atau non-anggota.');

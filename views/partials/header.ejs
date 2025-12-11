@@ -545,7 +545,6 @@
 
                         <!-- Menu untuk ANGGOTA -->
                         <% if (typeof user !=='undefined' && user && user.status==='Anggota' ) { %>
-                            <!-- Barang Sewaan (View only) -->
                             <div class="sidebar-menu-item">
                                 <a href="/barang/list-barang">
                                     <span>📋 Daftar Barang</span>
@@ -560,9 +559,16 @@
                                     <span class="chevron" id="chevron-transaksi-saya">▼</span>
                                 </button>
                                 <div class="sidebar-submenu" id="submenu-transaksi-saya">
-                                    <a href="/transaksi/my-transaksi">Riwayat Transaksi</a>
-                                    <a href="/transaksi/create">Buat Pemesanan</a>
+                                    <a href="/sewa/list-sewa">Riwayat Transaksi</a>
+                                    <a href="/sewa/create">Buat Pemesanan</a>
                                 </div>
+                            </div>
+
+                            <!-- Sewa Barang (Anggota) -->
+                            <div class="sidebar-menu-item">
+                                <a href="/sewa/create">
+                                    <span>🛒 Sewa Barang</span>
+                                </a>
                             </div>
 
                             <!-- Profil Saya -->
@@ -574,22 +580,33 @@
                             <% } %>
 
                                 <!-- Menu untuk NON-ANGGOTA -->
-                                <% if (typeof user !=='undefined' && user && user.status==='Non-Anggota' ) { %>
-                                    <!-- Barang Sewaan (View only) -->
+                                <% if (typeof user !=='undefined' && user && (user.status==='Non-Anggota' ||
+                                    user.status==='Nonanggota' || user.status==='Non Anggota' )) { %>
                                     <div class="sidebar-menu-item">
                                         <a href="/barang/list-barang">
                                             <span>📋 Daftar Barang</span>
                                         </a>
                                     </div>
 
-                                    <!-- Info Pengajuan -->
+                                    <!-- Jika non-anggota boleh buat sewa, tampilkan; jika tidak, hapus atau ubah -->
+                                    <div class="sidebar-menu-item">
+                                        <a href="/sewa/create">
+                                            <span>🛒 Sewa Barang</span>
+                                        </a>
+                                    </div>
+
+                                    <div class="sidebar-menu-item">
+                                        <a href="/sewa/list-sewa">
+                                            <span>📢 Riwayat Transaksi</span>
+                                        </a>
+                                    </div>
+
                                     <div class="sidebar-menu-item">
                                         <a href="/membership/info">
                                             <span>ℹ️ Info Keanggotaan</span>
                                         </a>
                                     </div>
 
-                                    <!-- Profil -->
                                     <div class="sidebar-menu-item">
                                         <a href="/profile">
                                             <span>👤 Profil</span>

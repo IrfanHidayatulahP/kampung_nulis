@@ -1,0 +1,95 @@
+<%- include('../../partials/header.ejs') %>
+
+    <% const _user=(typeof user !=='undefined' && user) ? user : null; const role=(_user && (_user.role || _user.status
+        || '' )) ? String(_user.role || _user.status).toString().trim().toLowerCase() : '' ; %>
+
+        <section class="container">
+            <% if (role !=='anggota' ) { %>
+                <h2>Akses ditolak</h2>
+                <p>Halaman ini hanya dapat diakses oleh <strong>Anggota</strong>. Silakan <a href="/login">login</a>
+                    dengan akun anggota.</p>
+                <% } else { %>
+
+                    <h1>Riwayat Transaksi Anda</h1>
+
+                    <% if (error) { %>
+                        <div class="alert alert-error">
+                            <%= error %>
+                        </div>
+                        <% } %>
+                            <% if (success) { %>
+                                <div class="alert alert-success">
+                                    <%= success %>
+                                </div>
+                                <% } %>
+
+                                    <div style="margin:12px 0;">
+                                        <a href="/sewa/create" class="btn">Buat Keranjang Baru</a>
+                                        <a href="/sewa/list-sewa" class="btn-ghost" style="margin-left:8px">Refresh</a>
+                                    </div>
+
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Tgl Sewa</th>
+                                                <th>Tgl Pengembalian</th>
+                                                <th>Status</th>
+                                                <th>Total</th>
+                                                <th>Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% if (!Array.isArray(list) || list.length===0) { %>
+                                                <tr>
+                                                    <td colspan="6">Belum ada transaksi.</td>
+                                                </tr>
+                                                <% } else { %>
+                                                    <% let shown=0; %>
+                                                        <% for (let i=0; i < list.length; i++) { const t=list[i]; if
+                                                            (String(t.username) !==String(_user && _user.username))
+                                                            continue; shown++; %>
+                                                            <tr>
+                                                                <td>
+                                                                    <%= t.id_transaksi %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= t.tgl_sewa || '-' %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= t.tgl_pengembalian || '-' %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= t.status_transaksi %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= t.total_biaya_sewa !=null ? t.total_biaya_sewa
+                                                                        : '-' %>
+                                                                </td>
+                                                                <td>
+                                                                    <a
+                                                                        href="/sewa/detail/<%= t.id_transaksi %>">Lihat</a>
+                                                                    |
+                                                                    <form action="/sewa/<%= t.id_transaksi %>/checkout"
+                                                                        method="POST" style="display:inline">
+                                                                        <button type="submit"
+                                                                            onclick="return confirm('Checkout transaksi ini?')">Checkout</button>
+                                                                    </form>
+                                                                </td>
+                                                            </tr>
+                                                            <% } %>
+
+                                                                <% if (shown===0) { %>
+                                                                    <tr>
+                                                                        <td colspan="6">Tidak ada transaksi untuk akun
+                                                                            Anda.</td>
+                                                                    </tr>
+                                                                    <% } %>
+                                                                        <% } %>
+                                        </tbody>
+                                    </table>
+
+                                    <% } %>
+        </section>
+
+        <%- include('../../partials/footer.ejs') %>
