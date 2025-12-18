@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Portal Desa — Beranda</title>
+    <style>
+        :root {
+            --primary1: #1e3c72;
+            --primary2: #2a5298;
+            --accent: #7e8ba3;
+            --muted: #64748b;
+            --light-bg: #f8fafc;
+            --border-color: #e2e8f0;
+            --success: #065f46;
+            --success-light: #ecfdf5;
+            --success-border: #d1fae5;
+            --error: #c41e3a;
+            --error-light: #fff1f0;
+            --error-border: #ffdad6;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e8ba3 100%);
+            color: #1f2937;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 28px;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 0;
+            margin-bottom: 24px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand .logo {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary1);
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(30, 60, 114, 0.2);
+        }
+
+        .brand-text {
+            color: white;
+        }
+
+        .brand-text>div:first-child {
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .brand-text>div:last-child {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn {
+            border-radius: 10px;
+            padding: 10px 16px;
+            text-decoration: none;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-outline {
+            background: white;
+            border: 2px solid var(--border-color);
+            color: var(--muted);
+        }
+
+        .btn-outline:hover {
+            background: var(--light-bg);
+            border-color: #cbd5e1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary1), var(--primary2));
+            color: white;
+            box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(30, 60, 114, 0.4);
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            gap: 28px;
+            align-items: center;
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .hero h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+            color: var(--primary1);
+        }
+
+        .hero p {
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .hero-cta {
+            margin-top: 18px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-top: 24px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: 0 8px 20px rgba(15, 20, 30, 0.08);
+            transition: all 0.22s ease;
+            display: flex;
+            flex-direction: column;
+            min-height: 220px;
+        }
+
+        .card:hover {
+            box-shadow: 0 12px 28px rgba(15, 20, 30, 0.12);
+            transform: translateY(-4px);
+        }
+
+        .card-top {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .card-media {
+            width: 96px;
+            height: 72px;
+            flex-shrink: 0;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f3f6fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .card-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .card h3 {
+            margin: 0;
+            font-size: 16px;
+            color: var(--primary1);
+        }
+
+        .meta {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .desc {
+            color: #475569;
+            font-size: 13px;
+            margin-top: 6px;
+            line-height: 1.4;
+            flex: 1;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        h2.section-title {
+            color: white;
+            font-size: 24px;
+            margin-top: 32px;
+            margin-bottom: 12px;
+        }
+
+        .empty {
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            text-align: center;
+            color: var(--muted);
+            box-shadow: 0 8px 20px rgba(15, 20, 30, 0.06);
+        }
+
+        footer {
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            text-align: center;
+        }
+
+        footer strong {
+            color: white;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width:880px) {
+            .hero {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                gap: 8px;
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .nav-links .btn {
+                width: 100%;
+                text-align: center;
+            }
+
+            .container {
+                margin: 20px;
+                padding: 18px;
+            }
+
+            .hero-cta {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- NAVBAR -->
+        <nav class="nav">
+            <div class="brand">
+                <div class="logo">PD</div>
+                <div class="brand-text">
+                    <div>Portal Desa</div>
+                    <div>Sewa tenda & layanan acara</div>
+                </div>
+            </div>
+
+            <div class="nav-links">
+                <% if (typeof user !== 'undefined' && user) { %>
+                    <div class="muted" style="color: rgba(255,255,255,0.9)">Halo, <%= user.nama_lengkap %></div>
+                    <a href="/logout" class="btn btn-outline">Logout</a>
+                <% } else { %>
+                    <a href="/login" class="btn btn-outline">Masuk</a>
+                    <a href="/register" class="btn btn-primary">Daftar</a>
+                <% } %>
+            </div>
+        </nav>
+
+        <!-- HERO -->
+        <section class="hero">
+            <div>
+                <% if (typeof success !== 'undefined' && success) { %>
+                    <div class="success-box"><%= success %></div>
+                <% } %>
+
+                <% if (typeof error !== 'undefined' && error) { %>
+                    <div class="error-box"><%= error %></div>
+                <% } %>
+
+                <h1>Selamat datang di Portal Desa</h1>
+                <p>Solusi cepat untuk memesan tenda, kursi, dan perlengkapan acara — langsung dari desa Anda.
+                    Lihat katalog, cek ketersediaan, dan pesan sekarang.</p>
+
+                <div class="hero-cta">
+                    <a href="/barang" class="btn btn-primary">Lihat Katalog</a>
+                    <a href="/contact" class="btn btn-outline">Hubungi Kami</a>
+                </div>
+
+                <div class="features" style="margin-top:18px">
+                    <div class="feature">
+                        <strong>Pesan Online</strong>
+                        <div class="muted">Proses pemesanan cepat & mudah.</div>
+                    </div>
+                    <div class="feature">
+                        <strong>Pengantaran & Ambil</strong>
+                        <div class="muted">Layanan antar ke lokasi acara.</div>
+                    </div>
+                    <div class="feature">
+                        <strong>Metode Pembayaran</strong>
+                        <div class="muted">Tunai atau transfer bank.</div>
+                    </div>
+                </div>
+            </div>
+
+            <aside>
+                <div style="border-radius:12px;overflow:hidden;box-shadow: 0 8px 20px rgba(15, 20, 30, 0.15);">
+                    <img src="/assets/hero-tenda.jpg" alt="tenda" style="width:100%;height:100%;object-fit:cover;display:block;min-height:260px;">
+                </div>
+            </aside>
+        </section>
+
+        <!-- KATEGORI / POPULAR ITEMS -->
+        <h2 class="section-title">Peralatan Populer</h2>
+
+        <div class="grid">
+            <% if (Array.isArray(items) && items.length) { %>
+                <% items.forEach(function(it) { %>
+                    <div class="card">
+                        <div class="card-top">
+                            <div class="card-media">
+                                <% /* jika ada field gambar di object, gunakan; kalau tidak tampilkan teks singkatan */ %>
+                                <% if (it.imageUrl) { %>
+                                    <img src="<%= it.imageUrl %>" alt="<%= it.nama_barang %>" style="width:100%;height:100%;object-fit:cover;display:block;">
+                                <% } else { %>
+                                    <div style="padding:6px;text-align:center;color:var(--muted);font-size:12px;">
+                                        IMG
+                                    </div>
+                                <% } %>
+                            </div>
+
+                            <div class="card-body">
+                                <h3><%= it.nama_barang || it.nama || 'Tidak bernama' %></h3>
+                                <div class="meta">Stok: <%= (typeof it.stok !== 'undefined' && it.stok !== null) ? it.stok : (typeof it.stok_tersedia !== 'undefined' ? it.stok_tersedia : '-') %></div>
+                                <div class="desc"><%= ((it.keterangan || it.deskripsi || '') + '').substring(0, 120) %></div>
+                            </div>
+                        </div>
+
+                        <!-- di dalam loop items.forEach -->
+                        <div class="card-actions">
+                        <a class="btn btn-outline" href="/barang/<%= it.id || it.id_barang || '' %>">Detail</a>
+
+                        <% if (typeof user !== 'undefined' && user) { %>
+                            <a class="btn btn-primary"
+                            href="/sewa/create?item=<%= it.id || it.id_barang || '' %>"
+                            aria-label="Pesan <%= it.nama_barang %>">Pesan</a>
+                        <% } else { %>
+                            <a class="btn btn-primary"
+                            href="/login?error=<%= encodeURIComponent('Silakan login terlebih dahulu untuk memesan') %>"
+                            rel="nofollow noopener"
+                            aria-label="Harus login untuk pesan <%= it.nama_barang %>">Pesan</a>
+                        <% } %>
+                        </div>
+
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="empty">Belum ada data barang. Coba kembali nanti.</div>
+            <% } %>
+        </div>
+
+        <!-- FOOTER -->
+        <footer>
+            <strong>Portal Desa</strong>
+            <div>© <%= new Date().getFullYear() %> Portal Desa. Semua hak dilindungi.</div>
+            <div style="margin-top: 8px;">Kontak: 0812-3456-7890 • alamatdesa@example.com</div>
+        </footer>
+    </div>
+</body>
+
+</html>

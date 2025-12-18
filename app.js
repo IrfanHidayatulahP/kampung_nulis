@@ -1,10 +1,10 @@
-// app.js
 require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
 
+const publicRoutes = require('./routes/publicRoutes');      // <-- tambah ini
 const authRoutes = require('./routes/authRoutes');
 const peminjamRoutes = require('./routes/peminjamRoutes');
 const barangRoutes = require('./routes/barangRoutes');
@@ -27,15 +27,18 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // session
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'secret_development', // ganti di .env
+  secret: process.env.SESSION_SECRET || 'secret_development',
   resave: false,
   saveUninitialized: false,
   cookie: { maxAge: 1000 * 60 * 60 * 4 } // 4 jam
 }));
 
-// Mount auth routes
+// Mount public routes FIRST so '/' will show the public dashboard
+app.use('/', publicRoutes);
+
+// Mount auth routes and others
 app.use('/', authRoutes);
-app.use('/peminjam', peminjamRoutes)
+app.use('/peminjam', peminjamRoutes);
 app.use('/barang', barangRoutes);
 app.use('/transaksi', transaksiSewaRoutes);
 app.use('/detail-transaksi', detailTransaksiRoutes);
@@ -48,6 +51,6 @@ app.use((req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, ()=> console.log(`Server berjalan di http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`Server berjalan di http://localhost:${PORT}`));
 
 module.exports = app;

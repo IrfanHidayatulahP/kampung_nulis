@@ -54,6 +54,88 @@ async function findBarangById(q, useFirst = false) {
     return useFirst ? like[0] || null : like;
 }
 
+// gantikan fungsi getPublicItems lama dengan ini
+exports.getPublicItems = async (limit = 8) => {
+    if (!Barang) {
+        const msg = "Model 'Barang' tidak tersedia";
+        console.error(msg);
+        throw new Error(msg);
+    }
+
+    // cari daftar kolom/atribut yang tersedia di model (Sequelize vX compat)
+    const rawAttrs = Barang.rawAttributes || Barang.tableAttributes || {};
+    const availableCols = Object.keys(rawAttrs); // e.g. ['id_barang','nama_barang','stok_tersedia', ...]
+
+    // kandidat field yang ingin kita tampilkan (urutkan prioritas)
+    const candidateFields = [
+        'id_barang', 'id',
+        'nama_barang', 'nama',
+        'stok_tersedia', 'stok',
+        'keterangan', 'deskripsi'
+    ];
+
+    // ambil intersection kandidat dengan kolom yang ada
+    const attrsToSelect = candidateFields.filter(c => availableCols.includes(c));
+
+    // tentukan kolom untuk order (prioritas id_barang, id, atau kolom pertama)
+    let orderBy = null;
+    if (availableCols.includes('id_barang')) orderBy = ['id_barang', 'DESC'];
+    else if (availableCols.includes('id')) orderBy = ['id', 'DESC'];
+    else if (availableCols.length) orderBy = [availableCols[0], 'DESC'];
+
+    // build query options
+    const opts = { limit: Number(limit) || 8 };
+    if (attrsToSelect.length) opts.attributes = attrsToSelect;
+    if (orderBy) opts.order = [orderBy];
+
+    // jalankan query — jika gagal karena alasan tak terduga, fallback ke query tanpa attributes
+    let items;
+    try {
+        items = await Barang.findAll(opts);
+    } catch (err) {
+        console.warn('getPublicItems: query with selected attributes failed, retrying without attributes. err:', err.message);
+        // fallback: ambil semua kolom (lebih aman)
+        items = await Barang.findAll({ limit: Number(limit) || 8, order: opts.order ? [opts.order] : undefined });
+    }
+
+    // kembalikan plain objects + normalisasi field supaya mudah dipakai view
+    return (Array.isArray(items) ? items : []).map(it => {
+        const obj = (it && typeof it.toJSON === 'function') ? it.toJSON() : (it || {});
+        return {
+            // canonical fields
+            id: obj.id_barang ?? obj.id ?? null,
+            nama_barang: obj.nama_barang ?? obj.nama ?? '',
+            stok_tersedia: (typeof obj.stok_tersedia !== 'undefined') ? obj.stok_tersedia
+                : (typeof obj.stok !== 'undefined' ? obj.stok : null),
+            keterangan: obj.keterangan ?? obj.deskripsi ?? ''
+        };
+    });
+};
+
+/**
+ * publicListApi
+ * route handler sederhana yang mereturn JSON list barang ringkas.
+ * Contoh route: router.get('/api/barang', barangController.publicListApi);
+ */
+exports.publicListApi = async (req, res) => {
+    try {
+        if (!ensureModelOrRespond(res)) return; // akan kirim 500 kalau model hilang
+        const limit = Math.min(100, Number(req.query.limit) || 8); // batasi maksimal 100
+        const items = await exports.getPublicItems(limit);
+        // hanya kirim field penting
+        const out = items.map(i => ({
+            id_barang: i.id_barang ?? i.id ?? null,
+            nama_barang: i.nama_barang ?? i.nama ?? '',
+            stok_tersedia: (typeof i.stok_tersedia !== 'undefined') ? i.stok_tersedia : null,
+            keterangan: i.keterangan ?? i.deskripsi ?? ''
+        }));
+        return res.json({ ok: true, data: out });
+    } catch (err) {
+        console.error('barang.publicListApi error:', err);
+        return res.status(500).json({ ok: false, error: 'Gagal mengambil data barang' });
+    }
+};
+
 /**
  * showIndex - daftar semua barang (opsional ?q= untuk pencarian nama atau id)
  */

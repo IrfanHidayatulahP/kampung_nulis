@@ -4,166 +4,190 @@
     || '' )) ? String(_user.role || _user.status).toString().trim().toLowerCase() : '' ; %>
 
     <section class="container">
-      <% if (role !=='anggota' ) { %>
-        <h2>Akses ditolak</h2>
-        <p>Halaman ini hanya untuk <strong>Anggota</strong>.</p>
-        <% } else { %>
-
-          <h1>Sewa Barang</h1>
-
-          <!-- daftar keranjang user (bisa >1) -->
+      <% if (!_user) { %>
+        <!-- Jika user tidak ada di session (harusnya route sudah melindungi) -->
+        <div class="card">
+          <h2>Akses Ditolak</h2>
+          <p class="muted">Anda harus <a
+              href="/login?error=<%= encodeURIComponent('Silakan login terlebih dahulu untuk memesan') %>">login</a>
+            sebagai anggota untuk membuat atau mengelola keranjang.</p>
+        </div>
+        <% } else if (role !=='anggota' ) { %>
           <div class="card">
-            <h3>Keranjang Anda</h3>
-            <% if (!carts || carts.length===0) { %>
-              <p>Belum ada keranjang. Buat keranjang baru di bawah.</p>
-              <% } else { %>
-                <p class="small">Pilih salah satu keranjang untuk menambahkan barang (atau gunakan keranjang terbaru).
-                </p>
-                <ul>
-                  <% carts.forEach(function(c) { %>
-                    <li style="margin-bottom:6px">
-                      <strong>ID:</strong>
-                      <%= c.id_transaksi %>
-                        — <span class="muted">Tgl: <%= c.tgl_sewa || '-' %></span>
-                        — <span class="muted">Status: <%= c.status_transaksi %></span>
-                        &nbsp;
-                        <a href="/sewa/create?cart=<%= c.id_transaksi %>">Pilih</a>
-                        &nbsp;|&nbsp;
-                        <a href="/sewa/detail/<%= c.id_transaksi %>">Kelola</a>
-                    </li>
-                    <% }) %>
-                </ul>
-                <% } %>
-
-                  <form action="/sewa/create" method="POST" style="margin-top:8px">
-                    <div class="form-group">
-                      <label>Username</label>
-                      <input type="text" name="username" value="<%= _user?.username || '' %>" readonly required />
-                    </div>
-                    <div class="form-actions">
-                      <button type="submit">Buat Keranjang Baru</button>
-                      <a href="/sewa/list-sewa" class="btn-ghost" style="margin-left:8px">Riwayat</a>
-                    </div>
-                  </form>
+            <h2>Akses ditolak</h2>
+            <p>Halaman ini hanya untuk <strong>Anggota</strong>.</p>
           </div>
+          <% } else { %>
 
-          <% if (!currentCart) { %>
-            <div class="card" style="margin-top:12px">
-              <p class="muted">Pilih atau buat keranjang terlebih dahulu untuk mulai menambah barang.</p>
-            </div>
-            <% } else { %>
+            <h1>Sewa Barang</h1>
 
-              <div class="card" style="margin-top:12px">
-                <h3>Keranjang Terpilih — ID: <strong>
-                    <%= currentCart.id_transaksi %>
-                  </strong></h3>
-                <p class="small">Tgl dibuat: <%= currentCart.tgl_sewa || '-' %> — Status: <%=
-                      currentCart.status_transaksi %>
-                </p>
-                <p>
-                  <a href="/sewa/detail/<%= currentCart.id_transaksi %>" class="btn">Kelola Keranjang</a>
-                  <a href="/sewa/list-sewa" class="btn-ghost" style="margin-left:8px">Riwayat</a>
-                </p>
-              </div>
+            <!-- daftar keranjang user (bisa >1) -->
+            <div class="card">
+              <h3>Keranjang Anda</h3>
+              <% if (!carts || carts.length===0) { %>
+                <p>Belum ada keranjang. Buat keranjang baru di bawah.</p>
+                <% } else { %>
+                  <p class="small">Pilih salah satu keranjang untuk menambahkan barang (atau gunakan keranjang terbaru).
+                  </p>
+                  <ul>
+                    <% carts.forEach(function(c) { %>
+                      <li style="margin-bottom:6px">
+                        <strong>ID:</strong>
+                        <%= c.id_transaksi %>
+                          — <span class="muted">Tgl: <%= c.tgl_sewa || '-' %></span>
+                          — <span class="muted">Status: <%= c.status_transaksi %></span>
+                          &nbsp;
+                          <a href="/sewa/create?cart=<%= c.id_transaksi %>">Pilih</a>
+                          &nbsp;|&nbsp;
+                          <a href="/sewa/detail/<%= c.id_transaksi %>">Kelola</a>
+                      </li>
+                      <% }) %>
+                  </ul>
+                  <% } %>
 
-              <div class="card" style="margin-top:12px">
-                <h3>Daftar Barang Tersedia</h3>
-                <% if (!barangs || barangs.length===0) { %>
-                  <p>Tidak ada barang tersedia saat ini.</p>
-                  <% } else { %>
-
-                    <!-- Batch form: pilih beberapa barang dan kirim sekaligus ke currentCart -->
-                    <form action="/sewa/<%= currentCart.id_transaksi %>/add" method="POST">
-                      <table class="table">
-                        <thead>
-                          <tr>
-                            <th>Pilih</th>
-                            <th>#</th>
-                            <th>Nama Barang</th>
-                            <th>Stok</th>
-                            <th>Harga / satuan</th>
-                            <th>Jumlah</th>
-                            <th>Aksi Cepat</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <% barangs.forEach(function(b, idx) { %>
-                            <tr>
-                              <td>
-                                <% if (b.stok_tersedia> 0) { %>
-                                  <input type="checkbox" name="items[<%= b.id_barang %>][selected]" value="1" />
-                                  <% } else { %>
-                                    -
-                                    <% } %>
-                              </td>
-                              <td>
-                                <%= idx+1 %>
-                              </td>
-                              <td>
-                                <%= b.nama_barang %>
-                              </td>
-                              <td>
-                                <%= b.stok_tersedia %>
-                              </td>
-                              <td>
-                                <%= b.harga_dasar_sewa %> / <%= b.satuan_jumlah || '-' %>
-                              </td>
-                              <td>
-                                <% if (b.stok_tersedia> 0) { %>
-                                  <input type="number" name="items[<%= b.id_barang %>][qty]" min="1"
-                                    max="<%= b.stok_tersedia %>" value="1" style="width:80px" />
-                                  <% } else { %>
-                                    -
-                                    <% } %>
-                              </td>
-                              <td>
-                                <% if (b.stok_tersedia> 0) { %>
-                                  <form action="/sewa/<%= currentCart.id_transaksi %>/add" method="POST"
-                                    style="display:inline">
-                                    <input type="hidden" name="id_barang" value="<%= b.id_barang %>" />
-                                    <input type="hidden" name="jumlah_sewa" value="1" />
-                                    <button type="submit">+1</button>
-                                  </form>
-                                  <% } else { %>
-                                    <span class="muted">Stok kosong</span>
-                                    <% } %>
-                              </td>
-                            </tr>
-                            <% }) %>
-                        </tbody>
-                      </table>
-
-                      <div style="margin-top:12px">
-                        <button type="submit">Tambah Terpilih ke Keranjang</button>
+                    <form action="/sewa/create" method="POST" style="margin-top:8px">
+                      <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" name="username" value="<%= _user?.username || '' %>" readonly required />
+                      </div>
+                      <div class="form-actions">
+                        <button type="submit">Buat Keranjang Baru</button>
+                        <a href="/sewa/list-sewa" class="btn-ghost" style="margin-left:8px">Riwayat</a>
                       </div>
                     </form>
-                    <% } %>
+            </div>
+
+            <% if (!currentCart) { %>
+              <div class="card" style="margin-top:12px">
+                <p class="muted">Pilih atau buat keranjang terlebih dahulu untuk mulai menambah barang.</p>
               </div>
-              <% } %>
+              <% } else { %>
+
+                <div class="card" style="margin-top:12px">
+                  <h3>Keranjang Terpilih — ID: <strong>
+                      <%= currentCart.id_transaksi %>
+                    </strong></h3>
+                  <p class="small">Tgl dibuat: <%= currentCart.tgl_sewa || '-' %> — Status: <%=
+                        currentCart.status_transaksi %>
+                  </p>
+                  <p>
+                    <a href="/sewa/detail/<%= currentCart.id_transaksi %>" class="btn">Kelola Keranjang</a>
+                    <a href="/sewa/list-sewa" class="btn-ghost" style="margin-left:8px">Riwayat</a>
+                  </p>
+                </div>
+
+                <div class="card" style="margin-top:12px">
+                  <h3>Daftar Barang Tersedia</h3>
+                  <% if (!barangs || barangs.length===0) { %>
+                    <p>Tidak ada barang tersedia saat ini.</p>
+                    <% } else { %>
+
+                      <!-- Batch form: pilih beberapa barang dan kirim sekaligus ke currentCart -->
+                      <form id="batchAddForm" action="/sewa/<%= currentCart.id_transaksi %>/add" method="POST">
+                        <table class="table">
+                          <thead>
+                            <tr>
+                              <th>Pilih</th>
+                              <th>#</th>
+                              <th>Nama Barang</th>
+                              <th>Stok</th>
+                              <th>Harga / satuan</th>
+                              <th>Jumlah</th>
+                              <th>Aksi Cepat</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <% barangs.forEach(function(b, idx) { %>
+                              <tr>
+                                <td>
+                                  <% if (b.stok_tersedia> 0) { %>
+                                    <input type="checkbox" class="item-checkbox"
+                                      name="items[<%= b.id_barang %>][selected]" value="1" />
+                                    <% } else { %>
+                                      -
+                                      <% } %>
+                                </td>
+                                <td>
+                                  <%= idx+1 %>
+                                </td>
+                                <td>
+                                  <%= b.nama_barang %>
+                                </td>
+                                <td>
+                                  <%= b.stok_tersedia %>
+                                </td>
+                                <td>
+                                  <%= b.harga_dasar_sewa %> / <%= b.satuan_jumlah || '-' %>
+                                </td>
+                                <td>
+                                  <% if (b.stok_tersedia> 0) { %>
+                                    <input type="number" class="item-qty" name="items[<%= b.id_barang %>][qty]" min="1"
+                                      max="<%= b.stok_tersedia %>" value="1" style="width:80px" disabled />
+                                    <% } else { %>
+                                      -
+                                      <% } %>
+                                </td>
+                                <td>
+                                  <% if (b.stok_tersedia> 0) { %>
+                                    <form action="/sewa/<%= currentCart.id_transaksi %>/add" method="POST"
+                                      style="display:inline">
+                                      <input type="hidden" name="id_barang" value="<%= b.id_barang %>" />
+                                      <input type="hidden" name="jumlah_sewa" value="1" />
+                                      <button type="submit">+1</button>
+                                    </form>
+                                    <% } else { %>
+                                      <span class="muted">Stok kosong</span>
+                                      <% } %>
+                                </td>
+                              </tr>
+                              <% }) %>
+                          </tbody>
+                        </table>
+
+                        <div style="margin-top:12px">
+                          <button type="submit" id="batchAddBtn">Tambah Terpilih ke Keranjang</button>
+                        </div>
+                      </form>
+
+                      <script>
+                        // client-side UX: enable qty only jika checkbox dicentang
+                        (function () {
+                          const batchForm = document.getElementById('batchAddForm');
+                          if (!batchForm) return;
+
+                          const checkboxes = batchForm.querySelectorAll('.item-checkbox');
+                          checkboxes.forEach(function (chk) {
+                            const name = chk.getAttribute('name'); // items[ID][selected]
+                            const m = name && name.match(/^items\[(\d+)\]\[selected\]/);
+                            if (!m) return;
+                            const id = m[1];
+                            const qty = batchForm.querySelector('.item-qty[name="items[' + id + '][qty]"]');
+                            if (qty) qty.disabled = !chk.checked;
+
+                            chk.addEventListener('change', function () {
+                              if (qty) qty.disabled = !chk.checked;
+                            });
+                          });
+
+                          batchForm.addEventListener('submit', function (e) {
+                            // pastikan setidaknya ada satu item terpilih
+                            const anyChecked = Array.from(batchForm.querySelectorAll('.item-checkbox')).some(cb => cb.checked);
+                            if (!anyChecked) {
+                              e.preventDefault();
+                              alert('Pilih minimal satu barang untuk ditambahkan ke keranjang.');
+                              return false;
+                            }
+                            // OK submit; server-side akan memvalidasi kembali
+                          });
+                        })();
+                      </script>
+
+                      <% } %>
+                </div>
 
                 <% } %>
+
+                  <% } %>
     </section>
-
-    <script>
-      // enable/disable qty based on checkbox
-      document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('input[type="checkbox"][name^="items"]').forEach(function (chk) {
-          const name = chk.name; // e.g. items[1][selected]
-          const match = name.match(/^items\[(\d+)\]\[selected\]/);
-          if (!match) return;
-          const id = match[1];
-          const qtyInput = document.querySelector('input[name="items[' + id + '][qty]"]');
-          if (!qtyInput) return;
-
-          qtyInput.disabled = !chk.checked;
-          chk.addEventListener('change', function () {
-            qtyInput.disabled = !this.checked;
-          });
-
-          // if checked by default, ensure enabled
-          if (chk.checked) qtyInput.disabled = false;
-        });
-      });
-    </script>
 
     <%- include('../../partials/footer.ejs') %>
