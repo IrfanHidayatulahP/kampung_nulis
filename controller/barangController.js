@@ -1,6 +1,8 @@
 // barangController.js (perbaikan: safe model lookup + better error messages)
 const db = require("../config/db");
 const { Op } = require("sequelize");
+const path = require('path');
+const fsSync = require('fs');
 
 // cari model Barang secara robust
 let Barang = db.barang || db.Barang || (db.models && (db.models.barang || db.models.Barang));
@@ -54,60 +56,69 @@ async function findBarangById(q, useFirst = false) {
     return useFirst ? like[0] || null : like;
 }
 
-// gantikan fungsi getPublicItems lama dengan ini
-exports.getPublicItems = async (limit = 8) => {
+// Tambahkan parameter q setelah limit
+exports.getPublicItems = async (limit = 8, q = "") => {
     if (!Barang) {
         const msg = "Model 'Barang' tidak tersedia";
         console.error(msg);
         throw new Error(msg);
     }
 
-    // cari daftar kolom/atribut yang tersedia di model (Sequelize vX compat)
     const rawAttrs = Barang.rawAttributes || Barang.tableAttributes || {};
-    const availableCols = Object.keys(rawAttrs); // e.g. ['id_barang','nama_barang','stok_tersedia', ...]
+    const availableCols = Object.keys(rawAttrs);
 
-    // kandidat field yang ingin kita tampilkan (urutkan prioritas)
     const candidateFields = [
         'id_barang', 'id',
         'nama_barang', 'nama',
         'stok_tersedia', 'stok',
-        'keterangan', 'deskripsi'
+        'harga_dasar_sewa',
+        'keterangan', 'deskripsi',
+        'photo_path'
     ];
 
-    // ambil intersection kandidat dengan kolom yang ada
     const attrsToSelect = candidateFields.filter(c => availableCols.includes(c));
 
-    // tentukan kolom untuk order (prioritas id_barang, id, atau kolom pertama)
+    // --- LOGIKA FILTER PENCARIAN (TAMBAHKAN INI) ---
+    const whereClause = {};
+    if (q && q.toString().trim() !== "") {
+        // Mencari berdasarkan nama_barang
+        whereClause.nama_barang = { [Op.like]: `%${q}%` };
+    }
+
     let orderBy = null;
     if (availableCols.includes('id_barang')) orderBy = ['id_barang', 'DESC'];
     else if (availableCols.includes('id')) orderBy = ['id', 'DESC'];
-    else if (availableCols.length) orderBy = [availableCols[0], 'DESC'];
 
-    // build query options
-    const opts = { limit: Number(limit) || 8 };
+    // Masukkan whereClause ke dalam options
+    const opts = {
+        limit: Number(limit) || 8,
+        where: whereClause // <-- Filter diterapkan di sini
+    };
+
     if (attrsToSelect.length) opts.attributes = attrsToSelect;
     if (orderBy) opts.order = [orderBy];
 
-    // jalankan query — jika gagal karena alasan tak terduga, fallback ke query tanpa attributes
     let items;
     try {
         items = await Barang.findAll(opts);
     } catch (err) {
-        console.warn('getPublicItems: query with selected attributes failed, retrying without attributes. err:', err.message);
-        // fallback: ambil semua kolom (lebih aman)
-        items = await Barang.findAll({ limit: Number(limit) || 8, order: opts.order ? [opts.order] : undefined });
+        console.warn('getPublicItems error, retrying without attributes:', err.message);
+        items = await Barang.findAll({
+            limit: Number(limit) || 8,
+            where: whereClause, // Tetap gunakan filter di fallback
+            order: orderBy ? [orderBy] : undefined
+        });
     }
 
-    // kembalikan plain objects + normalisasi field supaya mudah dipakai view
     return (Array.isArray(items) ? items : []).map(it => {
         const obj = (it && typeof it.toJSON === 'function') ? it.toJSON() : (it || {});
         return {
-            // canonical fields
             id: obj.id_barang ?? obj.id ?? null,
             nama_barang: obj.nama_barang ?? obj.nama ?? '',
-            stok_tersedia: (typeof obj.stok_tersedia !== 'undefined') ? obj.stok_tersedia
-                : (typeof obj.stok !== 'undefined' ? obj.stok : null),
-            keterangan: obj.keterangan ?? obj.deskripsi ?? ''
+            stok_tersedia: obj.stok_tersedia ?? obj.stok ?? 0,
+            harga_dasar_sewa: obj.harga_dasar_sewa ?? 0,
+            keterangan: obj.keterangan ?? obj.deskripsi ?? '',
+            photo_path: obj.photo_path ?? obj.photo ?? null
         };
     });
 };
@@ -259,12 +270,15 @@ exports.create = async (req, res) => {
             return res.redirect("/barang/create?error=" + encodeURIComponent("Nama barang sudah ada"));
         }
 
+        const photoRelPath = '/uploads/barang/' + req.file.filename;
+
         const payload = {
             nama_barang: String(nama_barang).trim(),
             jumlah_total: jt,
             stok_tersedia: st,
             satuan_jumlah: satuan_jumlah ? String(satuan_jumlah).trim() : null,
             harga_dasar_sewa: harga,
+            photo_path: photoRelPath
         };
 
         await Barang.create(payload, { transaction: t });
@@ -274,6 +288,10 @@ exports.create = async (req, res) => {
     } catch (err) {
         await t.rollback();
         console.error("barang.create error:", err);
+        // jika file berhasil diupload tapi DB gagal, hapus file agar tidak numpuk
+        if (req.file) {
+            try { fsSync.unlinkSync(path.join(__dirname, '..', 'public', req.file.path.replace(/^\/+/, ''))); } catch (e) {/*ignore*/ }
+        }
         return res.redirect("/barang/create?error=" + encodeURIComponent("Gagal menyimpan data"));
     }
 };
@@ -368,6 +386,23 @@ exports.update = async (req, res) => {
             }
         }
 
+        // kalau ada foto baru, simpan path dan hapus foto lama (jika ada)
+        if (req.file) {
+            const oldPath = item.photo_path; // mis: '/uploads/barang/xxx.jpg'
+            const newPath = '/uploads/barang/' + req.file.filename;
+            item.photo_path = newPath;
+
+            // hapus file lama (jika bukan null dan file ada)
+            try {
+                if (oldPath) {
+                    const oldFsPath = path.join(__dirname, '..', 'public', oldPath.replace(/^\/+/, ''));
+                    if (fsSync.existsSync(oldFsPath)) fsSync.unlinkSync(oldFsPath);
+                }
+            } catch (e) {
+                console.warn('Gagal menghapus file lama:', e.message);
+            }
+        }
+
         if (typeof nama_barang !== "undefined") item.nama_barang = String(nama_barang).trim();
         item.jumlah_total = jt;
         item.stok_tersedia = st;
@@ -381,6 +416,13 @@ exports.update = async (req, res) => {
     } catch (err) {
         await t.rollback();
         console.error("barang.update error:", err);
+        // hapus file baru kalau ada dan gagal
+        if (req.file) {
+            try {
+                const fpath = path.join(__dirname, '..', 'public', 'uploads', 'barang', req.file.filename);
+                if (fsSync.existsSync(fpath)) fsSync.unlinkSync(fpath);
+            } catch (e) {/*ignore*/ }
+        }
         return res.redirect(
             "/barang/edit/" + (req.params.id || "") + "?error=" + encodeURIComponent("Gagal mengupdate data")
         );
@@ -405,6 +447,16 @@ exports.delete = async (req, res) => {
         if (!record) {
             await t.rollback();
             return res.redirect("/barang/list-barang?error=" + encodeURIComponent("Data barang tidak ditemukan"));
+        }
+
+        // hapus file foto (jika ada)
+        try {
+            if (record.photo_path) {
+                const fileFs = path.join(__dirname, '..', 'public', record.photo_path.replace(/^\/+/, ''));
+                if (fsSync.existsSync(fileFs)) fsSync.unlinkSync(fileFs);
+            }
+        } catch (e) {
+            console.warn('Gagal menghapus foto saat delete:', e.message);
         }
 
         await Barang.destroy({ where: { id_barang: record.id_barang }, transaction: t });

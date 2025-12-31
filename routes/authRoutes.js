@@ -22,23 +22,21 @@ router.get('/', (req, res) => {
   return res.redirect('/login');
 });
 
-/* Role-based dashboards (same as before) */
 /* Admin */
 router.get('/admin/dashboard_admin', ...adminOnly, dashboardController.adminDashboard);
 router.get('/admin/users', ...adminOnly, (req, res) => res.send('Halaman manajemen pengguna (Admin).'));
 
-/* Anggota */
-router.get('/anggota/dashboard_anggota', ...anggotaOnly, dashboardController.anggotaDashboard);
-router.get('/anggota/profile', ...anggotaOnly, (req, res) => {
+/* Anggota & Non-Anggota -> sama dashboard anggota (dilindungi oleh role check) */
+router.get('/anggota/dashboard_anggota', attachUser, requireRole(['Anggota', 'Non-Anggota']), dashboardController.anggotaDashboard);
+router.get('/nonanggota/dashboard_nonanggota', attachUser, requireRole(['Anggota', 'Non-Anggota']), dashboardController.anggotaDashboard);
+
+/* Profile (contoh) */
+router.get('/anggota/profile', attachUser, requireRole(['Anggota', 'Non-Anggota']), (req, res) => {
   res.render('anggota/profile', { user: req.peminjam || req.session.user });
 });
 
-/* Non-Anggota */
-router.get('/nonanggota/dashboard_nonanggota', ...nonAnggotaOnly, dashboardController.nonAnggotaDashboard);
-router.get('/nonanggota/info', ...nonAnggotaOnly, (req, res) => res.send('Halaman informasi untuk Non-Anggota.'));
-
 /* Shared area example */
-router.get('/shared-area', attachUser, requireRole(['Admin','Anggota']), (req, res) => {
+router.get('/shared-area', attachUser, requireRole(['Admin', 'Anggota']), (req, res) => {
   res.send('Area bersama untuk Admin dan Anggota.');
 });
 

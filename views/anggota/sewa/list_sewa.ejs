@@ -1,95 +1,186 @@
 <%- include('../../partials/header.ejs') %>
 
-    <% const _user=(typeof user !=='undefined' && user) ? user : null; const role=(_user && (_user.role || _user.status
-        || '' )) ? String(_user.role || _user.status).toString().trim().toLowerCase() : '' ; %>
+    <div class="container" style="padding: 0 10px 10px 10px; max-width: 1200px; margin: 0 auto;">
+        <div class="page-content">
+            <div class="page-header">
+                <h2>📑 Riwayat Transaksi Sewa</h2>
+                <p class="text-muted">Daftar transaksi penyewaan yang telah Anda lakukan</p>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold">Riwayat Transaksi</h3>
 
-        <section class="container">
-            <% if (role !=='anggota' ) { %>
-                <h2>Akses ditolak</h2>
-                <p>Halaman ini hanya dapat diakses oleh <strong>Anggota</strong>. Silakan <a href="/login">login</a>
-                    dengan akun anggota.</p>
-                <% } else { %>
+                <a href="/anggota/dashboard_anggota" class="btn btn-secondary">
+                    ← Kembali ke Dashboard
+                </a>
+            </div>
 
-                    <h1>Riwayat Transaksi Anda</h1>
+            <% if (success) { %>
+                <div class="alert alert-success">
+                    <%= success %>
+                </div>
+                <% } %>
 
                     <% if (error) { %>
-                        <div class="alert alert-error">
+                        <div class="alert alert-danger">
                             <%= error %>
                         </div>
                         <% } %>
-                            <% if (success) { %>
-                                <div class="alert alert-success">
-                                    <%= success %>
-                                </div>
-                                <% } %>
 
-                                    <div style="margin:12px 0;">
-                                        <a href="/sewa/create" class="btn">Buat Keranjang Baru</a>
-                                        <a href="/sewa/list-sewa" class="btn-ghost" style="margin-left:8px">Refresh</a>
-                                    </div>
-
-                                    <table class="table">
+                            <% if (list && list.length> 0) { %>
+                                <div class="table-wrapper">
+                                    <table class="table-custom">
                                         <thead>
                                             <tr>
-                                                <th>ID</th>
-                                                <th>Tgl Sewa</th>
-                                                <th>Tgl Pengembalian</th>
+                                                <th>#</th>
+                                                <th>Tanggal Sewa</th>
+                                                <th>Tanggal Kembali</th>
                                                 <th>Status</th>
-                                                <th>Total</th>
+                                                <th>Total Biaya</th>
                                                 <th>Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <% if (!Array.isArray(list) || list.length===0) { %>
+                                            <% list.forEach((trx, index)=> { %>
                                                 <tr>
-                                                    <td colspan="6">Belum ada transaksi.</td>
-                                                </tr>
-                                                <% } else { %>
-                                                    <% let shown=0; %>
-                                                        <% for (let i=0; i < list.length; i++) { const t=list[i]; if
-                                                            (String(t.username) !==String(_user && _user.username))
-                                                            continue; shown++; %>
-                                                            <tr>
-                                                                <td>
-                                                                    <%= t.id_transaksi %>
-                                                                </td>
-                                                                <td>
-                                                                    <%= t.tgl_sewa || '-' %>
-                                                                </td>
-                                                                <td>
-                                                                    <%= t.tgl_pengembalian || '-' %>
-                                                                </td>
-                                                                <td>
-                                                                    <%= t.status_transaksi %>
-                                                                </td>
-                                                                <td>
-                                                                    <%= t.total_biaya_sewa !=null ? t.total_biaya_sewa
-                                                                        : '-' %>
-                                                                </td>
-                                                                <td>
-                                                                    <a
-                                                                        href="/sewa/detail/<%= t.id_transaksi %>">Lihat</a>
-                                                                    |
-                                                                    <form action="/sewa/<%= t.id_transaksi %>/checkout"
-                                                                        method="POST" style="display:inline">
-                                                                        <button type="submit"
-                                                                            onclick="return confirm('Checkout transaksi ini?')">Checkout</button>
-                                                                    </form>
-                                                                </td>
-                                                            </tr>
-                                                            <% } %>
+                                                    <td>
+                                                        <%= index + 1 %>
+                                                    </td>
+                                                    <td>
+                                                        <%= new Date(trx.tgl_sewa).toLocaleDateString('id-ID', {
+                                                            day: 'numeric' , month: 'short' , year: 'numeric' }) %>
+                                                    </td>
 
-                                                                <% if (shown===0) { %>
-                                                                    <tr>
-                                                                        <td colspan="6">Tidak ada transaksi untuk akun
-                                                                            Anda.</td>
-                                                                    </tr>
+                                                    <td>
+                                                        <% if (trx.tgl_pengembalian) { %>
+                                                            <%= new
+                                                                Date(trx.tgl_pengembalian).toLocaleDateString('id-ID', {
+                                                                day: 'numeric' , month: 'short' , year: 'numeric' }) %>
+                                                                <% } else { %>
+                                                                    <span style="color: #94a3b8;">-</span>
                                                                     <% } %>
-                                                                        <% } %>
+                                                    </td>
+
+                                                    <td>
+                                                        <span class="badge badge-<%= trx.status_transaksi %>">
+                                                            <%= trx.status_transaksi.toUpperCase() %>
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        Rp <%= Number(trx.total_biaya_sewa || 0).toLocaleString('id-ID')
+                                                            %>
+                                                    </td>
+                                                    <td>
+                                                        <a href="/sewa/detail/<%= trx.id_transaksi %>"
+                                                            class="btn-detail">
+                                                            Detail
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                <% }) %>
                                         </tbody>
                                     </table>
-
+                                </div>
+                                <% } else { %>
+                                    <div class="empty-state">
+                                        <div class="empty-icon">📭</div>
+                                        <h3>Belum Ada Transaksi</h3>
+                                        <p>Anda belum memiliki riwayat transaksi penyewaan.</p>
+                                        <a href="/anggota/dashboard" class="btn-primary-custom">
+                                            Mulai Sewa Barang
+                                        </a>
+                                    </div>
                                     <% } %>
-        </section>
+        </div>
+    </div>
 
-        <%- include('../../partials/footer.ejs') %>
+    <style>
+        /* Ubah padding-top menjadi lebih kecil (misal: 0 atau 10px) */
+        .container {
+            padding: 0px 10px 10px 10px !important;
+            /* Mengurangi jarak atas */
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .table-wrapper {
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            overflow-x: auto;
+        }
+
+        .table-custom {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table-custom th,
+        .table-custom td {
+            padding: 14px 16px;
+            text-align: left;
+        }
+
+        .table-custom thead {
+            background: #f1f5f9;
+        }
+
+        .table-custom tbody tr {
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .table-custom tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .badge-selesai {
+            background: #16a34a;
+        }
+
+        .badge-aktif {
+            background: #2563eb;
+        }
+
+        .badge-terlambat {
+            background: #dc2626;
+        }
+
+        .btn-detail {
+            padding: 8px 14px;
+            background: #2563eb;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+
+        .btn-detail:hover {
+            background: #1d4ed8;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: #fff;
+            border-radius: 12px;
+            border: 1px dashed #cbd5e1;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+    </style>
+
+    <%- include('../../partials/footer.ejs') %>

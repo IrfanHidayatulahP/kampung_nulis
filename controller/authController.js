@@ -5,7 +5,7 @@ const db = require('../config/db');
 const ROLE_ROUTES = {
     'Admin': '/admin/dashboard_admin',
     'Anggota': '/anggota/dashboard_anggota',
-    'Non-Anggota': '/nonanggota/dashboard_nonanggota'
+    'Non-Anggota': '/anggota/dashboard_anggota' // sama dashboard
 };
 
 exports.showLogin = (req, res) => {
@@ -102,7 +102,7 @@ exports.register = async (req, res) => {
         // hash password
         const hash = await bcrypt.hash(password, 10);
 
-        // buat record baru - default status = 'Non-Anggota' (ubah jika perlu)
+        // buat record baru - default status = 'Non-Anggota'
         await db.peminjam.create({
             username,
             password: hash,

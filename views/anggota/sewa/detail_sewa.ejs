@@ -1,170 +1,233 @@
 <%- include('../../partials/header.ejs') %>
 
-<% 
-  const _user = (typeof user !== 'undefined' && user) ? user : null;
-  const role = (_user && (_user.role || _user.status || '')) ? String(_user.role || _user.status).toString().trim().toLowerCase() : '';
-  // safe fallback untuk barangs supaya template tidak crash bila controller belum mengirim
-  const _barangs = (typeof barangs !== 'undefined' && Array.isArray(barangs)) ? barangs : [];
-%>
+    <div class="container" style="padding: 0 10px 10px 10px; max-width: 1200px; margin: 0 auto;">
+        <% const fmt=(v)=> {
+            try { return Number(v || 0).toLocaleString('id-ID'); }
+            catch (e) { return '0'; }
+            };
+            %>
 
-<section class="container">
-  <% if (role !== 'anggota') { %>
-    <h2>Akses ditolak</h2>
-    <p>Halaman ini hanya untuk <strong>Anggota</strong>.</p>
+            <div class="container detail-page">
 
-  <% } else if (!transaksi) { %>
-    <h2>Transaksi tidak ditemukan</h2>
-    <p>Transaksi yang anda pilih tidak tersedia.</p>
+                <!-- ================= HEADER ================= -->
+                <div class="detail-header">
+                    <h2>📄 Detail Transaksi</h2>
+                    <a href="/sewa/list-sewa" class="btn-back">← Kembali</a>
+                </div>
 
-  <% } else if (String(transaksi.username) !== String(_user?.username)) { %>
-    <h2>Akses ditolak</h2>
-    <p>Anda tidak berwenang melihat transaksi ini (bukan pemilik).</p>
+                <!-- ================= INFO TRANSAKSI ================= -->
+                <div class="trx-info-card">
+                    <div class="info-row">
+                        <span>ID Transaksi</span>
+                        <strong>#<%= transaksi.id_transaksi %></strong>
+                    </div>
+                    <div class="info-row">
+                        <span>Nama Peminjam</span>
+                        <strong>
+                            <%= nama_lengkap || user.username %>
+                        </strong>
+                    </div>
+                    <div class="info-row">
+                        <span>Tanggal Sewa</span>
+                        <strong>
+                            <%= transaksi.tgl_sewa ? new Date(transaksi.tgl_sewa).toLocaleDateString('id-ID') : '-' %>
+                        </strong>
+                    </div>
+                    <div class="info-row">
+                        <span>Tanggal Kembali</span>
+                        <strong>
+                            <%= transaksi.tgl_pengembalian ? new
+                                Date(transaksi.tgl_pengembalian).toLocaleDateString('id-ID') : '-' %>
+                        </strong>
+                    </div>
+                    <div class="info-row">
+                        <span>Status</span>
+                        <span class="badge badge-<%= transaksi.status_transaksi %>">
+                            <%= transaksi.status_transaksi.toUpperCase() %>
+                        </span>
+                    </div>
+                    <div class="info-row total">
+                        <span>Total Biaya</span>
+                        <strong>Rp <%= fmt(transaksi.total_biaya_sewa) %></strong>
+                    </div>
+                </div>
 
-  <% } else { %>
-    <!-- MAIN CONTENT -->
-    <h1>Detail Transaksi #<%= transaksi.id_transaksi %></h1>
+                <!-- ================= LIST BARANG ================= -->
+                <div class="detail-items">
+                    <h3>🧰 Daftar Barang Disewa</h3>
 
-    <% if (error) { %>
-      <div class="alert alert-error"><%= error %></div>
-    <% } %>
+                    <% if (details && details.length> 0) { %>
+                        <% details.forEach(item=> {
+                            const barang = item.barang || item.id_barang_barang || {};
+                            const subtotal = item.total_harga_sewa || (item.jumlah_sewa * item.harga_sewa_per_satuan);
+                            %>
 
-    <% if (success) { %>
-      <div class="alert alert-success"><%= success %></div>
-    <% } %>
+                            <div class="item-card">
+                                <div class="item-img">
+                                    <% if (barang.photo_path) { %>
+                                        <img src="<%= barang.photo_path %>" alt="<%= barang.nama_barang %>">
+                                        <% } else { %>
+                                            <div class="no-img">No Image</div>
+                                            <% } %>
+                                </div>
 
-    <div class="card">
-      <p><strong>Username:</strong> <%= transaksi.username %></p>
-      <p><strong>Tgl Sewa:</strong> <%= transaksi.tgl_sewa %></p>
-      <p><strong>Tgl Pengembalian (expected):</strong> <%= transaksi.tgl_pengembalian || '-' %></p>
-      <p><strong>Status:</strong> <%= transaksi.status_transaksi %></p>
-      <p><strong>Total Biaya:</strong> <%= transaksi.total_biaya_sewa != null ? transaksi.total_biaya_sewa : '-' %></p>
+                                <div class="item-info">
+                                    <h4>
+                                        <%= barang.nama_barang || 'Barang Tidak Diketahui' %>
+                                    </h4>
+                                    <p>Harga: Rp <%= fmt(item.harga_sewa_per_satuan) %> / hari</p>
+                                    <p>Jumlah: <strong>
+                                            <%= item.jumlah_sewa %>
+                                        </strong></p>
+                                </div>
+
+                                <div class="item-subtotal">
+                                    Rp <%= fmt(subtotal) %>
+                                </div>
+                            </div>
+
+                            <% }) %>
+                                <% } else { %>
+                                    <p class="text-muted">Tidak ada barang dalam transaksi ini.</p>
+                                    <% } %>
+                </div>
+
+            </div>
     </div>
 
-    <!-- Item pada Transaksi -->
-    <div class="card" style="margin-top:12px;">
-      <h3>Item pada Transaksi</h3>
+    <style>
+        .container {
+            padding: 0px 10px 10px 10px !important;
+            /* Mengurangi jarak atas */
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-      <% if (!details || details.length === 0) { %>
-        <p>Belum ada item pada transaksi ini.</p>
-      <% } else { %>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Nama Barang</th>
-              <th>Jumlah Pinjam</th>
-              <th>Kembali (bagus)</th>
-              <th>Harga/satuan</th>
-              <th>Total</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% details.forEach(function(d, idx) { %>
-              <tr>
-                <td><%= idx + 1 %></td>
-                <td><%= d.barang ? d.barang.nama_barang : ('ID:' + d.id_barang) %></td>
-                <td><%= d.jumlah_sewa %></td>
-                <td><%= d.qty_kembali_bagus || 0 %></td>
-                <td><%= d.harga_sewa_per_satuan %></td>
-                <td><%= d.total_harga_sewa != null ? d.total_harga_sewa : '-' %></td>
-                <td>
-                  <!-- update qty -->
-                  <form action="/sewa/<%= transaksi.id_transaksi %>/item/<%= d.id_barang %>/update" method="POST" style="display:inline-block">
-                    <input type="number" name="jumlah_sewa" value="<%= d.jumlah_sewa %>" min="0" style="width:72px" required />
-                    <button type="submit">Update</button>
-                  </form>
+        .detail-page {
+            max-width: 1000px;
+            margin: auto;
+            padding: 20px;
+        }
 
-                  <!-- delete item -->
-                  <form action="/sewa/<%= transaksi.id_transaksi %>/item/<%= d.id_barang %>/delete" method="POST" style="display:inline-block; margin-left:6px">
-                    <button type="submit" onclick="return confirm('Hapus item ini?')">Hapus</button>
-                  </form>
-                </td>
-              </tr>
-            <% }) %>
-          </tbody>
-        </table>
-      <% } %>
-    </div>
+        /* ===== HEADER ===== */
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
 
-    <!-- Tombol & Panel Tambah Barang -->
-    <div style="margin:10px 0">
-      <button type="button" id="btnToggleAdd" onclick="toggleAddPanel()">+ Tambah Jenis Barang</button>
-    </div>
+        .btn-back {
+            text-decoration: none;
+            color: #2563eb;
+            font-weight: bold;
+        }
 
-    <div id="addPanel" style="display:none; border:1px solid #ddd; padding:12px; margin-bottom:12px; background:#fafafa;">
-      <h3>Tambah beberapa barang ke keranjang</h3>
+        /* ===== TRANSAKSI INFO ===== */
+        .trx-info-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 30px;
+        }
 
-      <% if (_barangs.length === 0) { %>
-        <p>Tidak ada barang tersedia.</p>
-      <% } else { %>
-        <!-- batch add form -->
-        <form action="/sewa/<%= transaksi.id_transaksi %>/add" method="POST">
-          <table class="table" style="width:100%; border-collapse:collapse;">
-            <thead>
-              <tr>
-                <th style="width:40px">Pilih</th>
-                <th>Nama Barang</th>
-                <th style="width:120px">Jumlah</th>
-                <th style="width:120px">Stok</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% _barangs.forEach(function(b) { %>
-                <tr>
-                  <td style="text-align:center;">
-                    <input type="checkbox" name="items[<%= b.id_barang %>][selected]" value="1" />
-                  </td>
-                  <td><%= b.nama_barang %></td>
-                  <td>
-                    <input type="number" name="items[<%= b.id_barang %>][qty]" value="1" min="1" style="width:72px" />
-                  </td>
-                  <td><%= (b.stok_tersedia != null) ? b.stok_tersedia : '-' %></td>
-                </tr>
-              <% }) %>
-            </tbody>
-          </table>
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
 
-          <div style="margin-top:8px">
-            <button type="submit">Tambahkan yang dipilih</button>
-            <button type="button" onclick="toggleAddPanel()" style="margin-left:8px">Batal</button>
-          </div>
-        </form>
+        .info-row.total {
+            border-top: 1px dashed #cbd5e1;
+            margin-top: 10px;
+            padding-top: 12px;
+            font-size: 1.05rem;
+        }
 
-        <hr style="margin:12px 0">
+        .badge {
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: white;
+        }
 
-        <!-- quick single-add (legacy fallback id_barang + jumlah_sewa) -->
-        <form action="/sewa/<%= transaksi.id_transaksi %>/add" method="POST" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-          <label for="quick_id">Tambah cepat:</label>
-          <select id="quick_id" name="id_barang" required>
-            <option value="">-- Pilih barang --</option>
-            <% _barangs.forEach(function(b) { %>
-              <option value="<%= b.id_barang %>"><%= b.nama_barang %> (stok: <%= (b.stok_tersedia != null) ? b.stok_tersedia : '-' %>)</option>
-            <% }) %>
-          </select>
-          <input type="number" name="jumlah_sewa" value="1" min="1" style="width:80px" required />
-          <button type="submit">Tambah</button>
-        </form>
-      <% } %>
-    </div>
+        .badge-aktif {
+            background: #2563eb;
+        }
 
-    <script>
-      function toggleAddPanel() {
-        var el = document.getElementById('addPanel');
-        if (!el) return;
-        el.style.display = (el.style.display === 'none' || el.style.display === '') ? 'block' : 'none';
-      }
-    </script>
+        .badge-disewa {
+            background: #16a34a;
+        }
 
-    <!-- Checkout & kembali -->
-    <div style="margin-top:12px">
-      <form action="/sewa/<%= transaksi.id_transaksi %>/checkout" method="POST" onsubmit="return confirm('Checkout? Stok akan dikurangi.')">
-        <button type="submit">Checkout</button>
-      </form>
-      <a href="/sewa/list-sewa" style="margin-left:12px">Kembali</a>
-    </div>
+        .badge-selesai {
+            background: #16a34a;
+        }
 
-  <% } /* end main else (owner & transaksi valid) */ %>
-</section>
+        .badge-terlambat {
+            background: #dc2626;
+        }
 
-<%- include('../../partials/footer.ejs') %>
+        /* ===== ITEMS ===== */
+        .detail-items h3 {
+            margin-bottom: 15px;
+        }
+
+        .item-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            display: grid;
+            grid-template-columns: 90px 1fr 140px;
+            gap: 16px;
+            align-items: center;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 16px;
+        }
+
+        .item-img {
+            width: 90px;
+            height: 90px;
+            background: #f1f5f9;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .item-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .no-img {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .item-info h4 {
+            margin: 0 0 6px;
+        }
+
+        .item-subtotal {
+            text-align: right;
+            font-weight: bold;
+        }
+
+        /* ===== MOBILE ===== */
+        @media (max-width: 768px) {
+            .item-card {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .item-subtotal {
+                text-align: center;
+            }
+        }
+    </style>
+
+    <%- include('../../partials/footer.ejs') %>

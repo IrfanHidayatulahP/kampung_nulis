@@ -1,31 +1,39 @@
 // routes/sewaRoutes.js
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const sewaController = require('../controller/sewaController');
+const sewaController = require("../controller/sewaController");
 
-// middleware: hanya anggota yang boleh mengakses
-const anggotaOnly = require('../middleware/anggota'); // pastikan file ada: middleware/anggota.js
+// Middleware sederhana untuk memastikan user sudah login
+const isLogin = (req, res, next) => {
+    if (req.session && req.session.user) {
+        next();
+    } else {
+        res.redirect("/login?error=" + encodeURIComponent("Silakan login terlebih dahulu"));
+    }
+};
 
-// LIST transaksi (halaman index)
-router.get('/list-sewa', anggotaOnly, sewaController.showIndex);
+// 1. Rute Riwayat Transaksi (Daftar sewa yang sudah checkout)
+// URL: /sewa/list-sewa
+router.get("/list-sewa", isLogin, sewaController.showIndex);
 
-// DETAIL transaksi (halaman detail)
-router.get('/detail/:id', anggotaOnly, sewaController.showTransactionDetail);
+// 2. Rute Tambah ke Keranjang (Action dari dashboard/list barang)
+// URL: /sewa/add-to-cart
+router.post("/add-to-cart", isLogin, sewaController.addToCart);
 
-// Create cart / transaksi (form + submit)
-router.get('/create', anggotaOnly, sewaController.showCreateCartForm);
-router.post('/create', anggotaOnly, sewaController.createCart);
+// 3. Rute Tampilan Keranjang (Cart)
+// URL: /sewa/cart
+router.get("/cart", isLogin, sewaController.showCart);
 
-// Cart item management
-router.post('/:id_transaksi/add', anggotaOnly, sewaController.addToCart);
-router.post('/:id_transaksi/item/:id_barang/update', anggotaOnly, sewaController.updateCartItem);
-router.post('/:id_transaksi/item/:id_barang/delete', anggotaOnly, sewaController.removeFromCart);
+// 4. Rute Update Item di Keranjang (Ubah Qty atau Hapus)
+// URL: /sewa/update-item
+router.post("/update-item", isLogin, sewaController.updateCartItem);
 
-// Checkout & Return
-router.post('/:id_transaksi/checkout', anggotaOnly, sewaController.checkoutTransaction);
-router.post('/:id_transaksi/return', anggotaOnly, sewaController.returnTransaction);
+// 5. Rute Checkout (Finalisasi pesanan dari keranjang)
+// URL: /sewa/checkout
+router.post("/checkout", isLogin, sewaController.checkoutTransaction);
 
-// API helper: daftar transaksi user (JSON)
-router.get('/user/:username', anggotaOnly, sewaController.listUserTransactions);
+// 6. Rute Detail Transaksi (Untuk melihat rincian barang di riwayat)
+// URL: /sewa/detail/12
+router.get("/detail/:id", isLogin, sewaController.showTransactionDetail);
 
 module.exports = router;

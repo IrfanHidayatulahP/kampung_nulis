@@ -445,8 +445,8 @@
                     </svg>
                 </div>
                 <div class="sidebar-brand-text">
-                    <div class="title">Kampung Nulis</div>
-                    <div class="subtitle">Portal Desa Digital</div>
+                    <div class="title">Jasa Sewa Barang</div>
+                    <div class="subtitle">Kampung Nulis</div>
                 </div>
             </div>
             <button class="sidebar-close" onclick="toggleSidebar()" aria-label="Close sidebar">×</button>
@@ -485,8 +485,6 @@
                         </button>
                         <div class="sidebar-submenu" id="submenu-peminjam">
                             <a href="/peminjam/list-peminjam">Daftar Peminjam</a>
-                            <a href="/peminjam/create">Tambah Peminjam</a>
-                            <a href="/peminjam/import">Import Data</a>
                         </div>
                     </div>
 
@@ -498,7 +496,6 @@
                         </button>
                         <div class="sidebar-submenu" id="submenu-barang">
                             <a href="/barang/list-barang">List Barang</a>
-                            <a href="/barang/create">Tambah Barang</a>
                         </div>
                     </div>
 
@@ -511,7 +508,6 @@
                         </button>
                         <div class="sidebar-submenu" id="submenu-transaksi-sewa">
                             <a href="/transaksi/list-transaksi">Daftar Transaksi</a>
-                            <a href="/transaksi/create">Buat Transaksi</a>
                         </div>
                     </div>
 
@@ -524,7 +520,6 @@
                         </button>
                         <div class="sidebar-submenu" id="submenu-detail-transaksi">
                             <a href="/detail-transaksi/list-detail">List Detail Transaksi</a>
-                            <a href="/detail-transaksi/create">Tambah Detail Transaksi</a>
                         </div>
                     </div>
 
@@ -537,7 +532,6 @@
                         </button>
                         <div class="sidebar-submenu" id="submenu-rusak-hilang">
                             <a href="/rusak-hilang/list">List Rusak / Hilang</a>
-                            <a href="/rusak-hilang/create">Tambah Rusak / Hilang</a>
                         </div>
                     </div>
 
@@ -545,32 +539,6 @@
 
                         <!-- Menu untuk ANGGOTA -->
                         <% if (typeof user !=='undefined' && user && user.status==='Anggota' ) { %>
-                            <div class="sidebar-menu-item">
-                                <a href="/barang/list-barang">
-                                    <span>📋 Daftar Barang</span>
-                                </a>
-                            </div>
-
-                            <!-- Transaksi Sewa Saya -->
-                            <div class="sidebar-menu-item">
-                                <button onclick="toggleSubmenu('transaksi-saya')" aria-expanded="false"
-                                    aria-controls="submenu-transaksi-saya">
-                                    <span>📢 Transaksi Saya</span>
-                                    <span class="chevron" id="chevron-transaksi-saya">▼</span>
-                                </button>
-                                <div class="sidebar-submenu" id="submenu-transaksi-saya">
-                                    <a href="/sewa/list-sewa">Riwayat Transaksi</a>
-                                    <a href="/sewa/create">Buat Pemesanan</a>
-                                </div>
-                            </div>
-
-                            <!-- Sewa Barang (Anggota) -->
-                            <div class="sidebar-menu-item">
-                                <a href="/sewa/create">
-                                    <span>🛒 Sewa Barang</span>
-                                </a>
-                            </div>
-
                             <!-- Profil Saya -->
                             <div class="sidebar-menu-item">
                                 <a href="/profile">
@@ -636,9 +604,9 @@
                 </div>
                 <div class="brand-text">
                     <div class="title">
-                        <%= (typeof title !=='undefined' && title) ? title : 'Portal Kampung Nulis' %>
+                        <%= (typeof title !=='undefined' && title) ? title : 'Jasa Sewa Barang' %>
                     </div>
-                    <div class="subtitle">Sistem Informasi Desa Digital</div>
+                    <div class="subtitle">Kampung Nulis</div>
                 </div>
             </div>
         </div>

@@ -1,0 +1,305 @@
+<%- include('../../partials/header.ejs') %>
+
+    <div class="container" style="padding: 0 10px 10px 10px; max-width: 1200px; margin: 0 auto;">
+        <% // helper format angka aman 
+        const fmt=(v)=> {
+            try { return Number(v || 0).toLocaleString('id-ID'); }
+            catch (e) { return '0'; }
+            };
+        %>
+
+            <div class="container cart-page">
+
+                <div class="page-content">
+                    <div class="cart-header">
+                        <h2>🛒 Keranjang Sewa Anda</h2>
+                        <p class="text-muted">Kelola barang yang ingin Anda sewa sebelum melakukan konfirmasi akhir.</p>
+                    </div>
+
+                    <% if (cartItems && cartItems.length> 0) { %>
+
+                        <div class="cart-container">
+
+                            <!-- ================== LIST BARANG ================== -->
+                            <div class="cart-items">
+
+                                <% cartItems.forEach(item=> { %>
+                                    <div class="cart-card" id="item-<%= item.id_keranjang %>">
+
+                                        <div class="cart-img">
+                                            <% if (item.photo_path) { %>
+                                                <img src="<%= item.photo_path %>"
+                                                    alt="<%= item.nama_barang || 'Barang' %>">
+                                                <% } else { %>
+                                                    <div class="no-img-small">No Photo</div>
+                                                    <% } %>
+                                        </div>
+
+                                        <div class="cart-details">
+                                            <h4>
+                                                <%= item.nama_barang || 'Barang Tidak Diketahui' %>
+                                            </h4>
+                                            <p class="unit-price">Rp <%= fmt(item.harga_sewa_per_satuan) %> / hari</p>
+                                            <p>Jumlah: <strong>
+                                                    <%= item.jumlah %>
+                                                </strong></p>
+                                        </div>
+
+                                        <div class="cart-subtotal">
+                                            <p class="subtotal-amount">Rp <%= fmt(item.total_harga_sewa) %>
+                                            </p>
+                                        </div>
+
+                                        <div class="cart-actions">
+                                            <form action="/sewa/update-item" method="POST"
+                                                onsubmit="return confirm('Hapus barang ini dari keranjang?')">
+                                                <input type="hidden" name="id_transaksi"
+                                                    value="<%= transaksi?.id_transaksi || '' %>">
+                                                <input type="hidden" name="id_barang" value="<%= item.id_barang %>">
+                                                <input type="hidden" name="new_qty" value="0">
+                                                <button type="submit" class="btn-delete-cart" title="Hapus">🗑️</button>
+                                            </form>
+                                        </div>
+
+                                    </div>
+                                    <% }) %>
+
+                            </div>
+
+                            <!-- ================== SUMMARY ================== -->
+                            <div class="cart-summary">
+                                <h3>Ringkasan Sewa</h3>
+                                <hr>
+
+                                <div class="summary-row">
+                                    <span>Total Barang</span>
+                                    <span>
+                                        <%= cartItems.length %> Item
+                                    </span>
+                                </div>
+
+                                <div class="summary-row total">
+                                    <span>Total Estimasi</span>
+                                    <span>Rp <%= fmt(totalBiaya) %></span>
+                                </div>
+
+                                <form action="/sewa/checkout" method="POST">
+                                    <input type="hidden" name="id_transaksi"
+                                        value="<%= transaksi?.id_transaksi || '' %>">
+
+                                    <div class="form-group" style="margin-bottom: 15px;">
+                                        <label style="font-weight: 600; display: block; margin-bottom: 8px;">
+                                            Rencana Tanggal Pengembalian <span style="color:red">*</span>
+                                        </label>
+
+                                        <% const today=new Date().toISOString().split('T')[0]; %>
+
+                                            <input type="date" name="expected_return_date" class="form-input" required
+                                                min="<%= today %>"
+                                                style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px;">
+                                            <small class="text-muted" style="font-size: 0.8rem; color: #64748b;">
+                                                Pilih tanggal kapan Anda akan mengembalikan barang.
+                                            </small>
+                                    </div>
+
+                                    <button type="submit" class="btn-checkout">Lanjutkan Penyewaan</button>
+                                </form>
+
+                                <a href="/anggota/dashboard_anggota" class="btn-continue">← Tambah Barang Lain</a>
+                            </div>
+
+                        </div>
+
+                        <% } else { %>
+
+                            <!-- ================== EMPTY ================== -->
+                            <div class="empty-cart">
+                                <div class="empty-icon">🛒</div>
+                                <h3>Keranjang Kosong</h3>
+                                <p>Anda belum memilih barang untuk disewa.</p>
+                                <a href="/anggota/dashboard_anggota" class="btn-primary-custom">Mulai Cari Barang</a>
+                            </div>
+
+                            <% } %>
+
+                </div>
+            </div>
+    </div>
+
+    <style>
+        /* ================== LAYOUT ================== */
+        .container {
+            padding: 0px 10px 10px 10px !important;
+            /* Mengurangi jarak atas */
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .cart-page {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .cart-header {
+            margin-bottom: 30px;
+        }
+
+        .cart-container {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 30px;
+            align-items: start;
+        }
+
+        /* ================== CARD ================== */
+        .cart-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            display: grid;
+            grid-template-columns: 90px 1fr 140px 50px;
+            gap: 16px;
+            align-items: center;
+            margin-bottom: 16px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, .04);
+        }
+
+        .cart-img {
+            width: 90px;
+            height: 90px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cart-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .no-img-small {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .cart-details h4 {
+            margin: 0 0 6px;
+            font-size: 1rem;
+        }
+
+        .unit-price {
+            font-size: .9rem;
+            color: #475569;
+        }
+
+        .cart-subtotal {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .subtotal-amount {
+            font-size: 1rem;
+        }
+
+        /* ================== ACTION ================== */
+        .cart-actions {
+            display: flex;
+            justify-content: center;
+        }
+
+        .btn-delete-cart {
+            background: #fee2e2;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .btn-delete-cart:hover {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        /* ================== SUMMARY ================== */
+        .cart-summary {
+            background: #fff;
+            padding: 24px;
+            border-radius: 14px;
+            border: 1px solid #e5e7eb;
+            position: sticky;
+            top: 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .summary-row.total {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .btn-checkout {
+            width: 100%;
+            padding: 14px;
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            margin-top: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-checkout:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-continue {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: .9rem;
+        }
+
+        /* ================== EMPTY ================== */
+        .empty-cart {
+            text-align: center;
+            padding: 80px 20px;
+            background: #fff;
+            border-radius: 14px;
+            border: 1px dashed #cbd5e1;
+        }
+
+        /* ================== MOBILE ================== */
+        @media (max-width: 900px) {
+            .cart-container {
+                grid-template-columns: 1fr;
+            }
+
+            .cart-card {
+                grid-template-columns: 80px 1fr;
+                grid-template-rows: auto auto;
+            }
+
+            .cart-subtotal,
+            .cart-actions {
+                grid-column: span 2;
+                justify-content: flex-end;
+                text-align: right;
+            }
+        }
+    </style>
+
+    <%- include('../../partials/footer.ejs') %>

@@ -291,6 +291,7 @@ exports.delete = async (req, res) => {
 };
 
 /** showDetail - tampilkan detail transaksi berdasarkan id */
+/** showDetail - tampilkan detail transaksi (termasuk barang yang disewa) */
 exports.showDetail = async (req, res) => {
     try {
         if (!ensureModelOrRespond(res)) return;
@@ -298,9 +299,80 @@ exports.showDetail = async (req, res) => {
         const id = req.params.id;
         if (!isValidId(id)) return res.redirect("/transaksi/list-transaksi?error=" + encodeURIComponent("ID tidak valid"));
 
-        const record = await Transaksi.findByPk(Number(id));
-        if (!record) return res.status(404).send("Data transaksi tidak ditemukan untuk ID ini");
+        // ambil model fallback dari db
+        const Detail = db.detail_transaksi || db.Detail_transaksi || db.detailTransaksi || db.DetailTransaksi || (db.models && (db.models.detail_transaksi || db.models.Detail_transaksi));
+        const Barang = db.barang || db.Barang || (db.models && (db.models.barang || db.models.Barang));
 
+        let record = null;
+
+        // pertama coba pakai eager loading dengan alias yang ada: 'detail_transaksis'
+        try {
+            record = await Transaksi.findByPk(Number(id), {
+                include: [
+                    {
+                        model: Detail,
+                        as: 'detail_transaksis', // <-- pakai alias yang sesuai dengan association Anda
+                        required: false,
+                        include: [
+                            // sertakan barang jika asosiasi dari Detail ke Barang ada
+                            (Barang ? { model: Barang, as: 'barang', required: false } : null)
+                        ].filter(Boolean)
+                    }
+                ]
+            });
+        } catch (err) {
+            // jika error type eager loading -> fallback ke manual fetch
+            console.warn("showDetail: eager include failed, falling back to manual fetch. err:", err && err.message);
+        }
+
+        // jika record masih null (atau include gagal), ambil transaksi dulu, lalu fetch detail secara manual
+        if (!record) {
+            record = await Transaksi.findByPk(Number(id));
+            if (!record) return res.status(404).send("Data transaksi tidak ditemukan untuk ID ini");
+
+            // fetch details manual jika model Detail tersedia
+            let details = [];
+            if (Detail) {
+                details = await Detail.findAll({ where: { id_transaksi: Number(id) } });
+                // jika Barang tersedia, attach barang ke tiap detail (fallback N+1, tapi aman)
+                if (Barang && details.length > 0) {
+                    // ubah tiap detail menjadi plain object dan attach barang
+                    const detailsPlain = await Promise.all(details.map(async (d) => {
+                        const obj = (d && typeof d.toJSON === 'function') ? d.toJSON() : (d || {});
+                        try {
+                            const br = await Barang.findByPk(Number(obj.id_barang));
+                            obj.barang = br && typeof br.toJSON === 'function' ? br.toJSON() : (br || null);
+                        } catch (e) {
+                            obj.barang = null;
+                        }
+                        return obj;
+                    }));
+                    // set details result sebagai plain array
+                    record = (typeof record.toJSON === 'function') ? record.toJSON() : record;
+                    record.detail_transaksis = detailsPlain;
+                } else {
+                    // tanpa Barang, hanya plain details
+                    const detailsPlain = details.map(d => (d && typeof d.toJSON === 'function') ? d.toJSON() : d);
+                    record = (typeof record.toJSON === 'function') ? record.toJSON() : record;
+                    record.detail_transaksis = detailsPlain;
+                }
+            } else {
+                // tidak ada Detail model, tetap pakai record plain dengan array kosong
+                record = (typeof record.toJSON === 'function') ? record.toJSON() : record;
+                record.detail_transaksis = [];
+            }
+
+            // render view dan return
+            return res.render("admin/transaksi/detail_transaksi", {
+                transaksi: record,
+                user: req.session?.user || null,
+                nama_lengkap: req.session?.user?.nama_lengkap || "",
+                error: req.query.error || null,
+                success: req.query.success || null,
+            });
+        }
+
+        // kalau record didapat dari eager include, jadikan plain object
         const recordPlain = typeof record.toJSON === "function" ? record.toJSON() : record;
 
         return res.render("admin/transaksi/detail_transaksi", {

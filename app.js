@@ -22,6 +22,9 @@ app.set('view engine', 'ejs');
 // static
 app.use(express.static(path.join(__dirname, 'public')));
 
+// pastikan folder public/uploads tersedia di project
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
+
 // body parser
 app.use(bodyParser.urlencoded({ extended: false }));
 

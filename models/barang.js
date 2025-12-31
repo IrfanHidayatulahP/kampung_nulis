@@ -27,6 +27,10 @@ module.exports = function(sequelize, DataTypes) {
     harga_dasar_sewa: {
       type: DataTypes.INTEGER,
       allowNull: false
+    },
+    photo_path: {
+      type: DataTypes.STRING(255),
+      allowNull: false
     }
   }, {
     sequelize,

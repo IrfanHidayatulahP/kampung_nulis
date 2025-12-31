@@ -1,97 +1,104 @@
 <%- include('../../partials/header.ejs') %>
-    <% // Ambil role dari user (akses dari variabel yang dikirim controller) 
-        const rawRole=(user && (user.role ||
-        user.status)) || '' ; const roleNorm=String(rawRole) .toLowerCase() .replace(/\s+/g,'') .replace(/[_-]/g,'');
-        const isAdmin=roleNorm==='admin' ; const isAnggota=roleNorm==='anggota' ; const
-        isNonAnggota=roleNorm==='nonanggota' ; 
-    %>
+    <% const rawRole=(user && (user.role || user.status)) || '' ; const
+        roleNorm=String(rawRole).toLowerCase().replace(/\s+/g,'').replace(/[_-]/g,''); const isAdmin=roleNorm==='admin'
+        ; %>
 
-
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2>Daftar Barang</h2>
-            <div>
-                <% if (isAdmin) { %>
-                    <a href="/barang/create" class="btn btn-primary">Tambah Barang</a>
-                    <% } %>
+        <div class="container mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2>Daftar Barang</h2>
+                <div>
+                    <% if (isAdmin) { %>
+                        <a href="/barang/create" class="btn btn-primary">Tambah Barang</a>
+                        <% } %>
+                </div>
             </div>
+
+            <% if (typeof error !=='undefined' && error) { %>
+                <div class="alert alert-danger">
+                    <%= error %>
+                </div>
+                <% } %>
+                    <% if (typeof success !=='undefined' && success) { %>
+                        <div class="alert alert-success">
+                            <%= success %>
+                        </div>
+                        <% } %>
+
+                            <form class="mb-3" method="get" action="/barang/list-barang">
+                                <div class="input-group">
+                                    <input type="text" name="q" class="form-control" placeholder="Cari nama atau id..."
+                                        value="<%= filter_q || '' %>">
+                                    <button class="btn btn-outline-secondary" type="submit">Cari</button>
+                                </div>
+                            </form>
+
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Foto</th>
+                                            <th>Nama Barang</th>
+                                            <th>Jumlah Total</th>
+                                            <th>Stok Tersedia</th>
+                                            <th>Satuan</th>
+                                            <th>Harga Sewa</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (records && records.length) { %>
+                                            <% records.forEach(function(b) { %>
+                                                <tr>
+                                                    <td>
+                                                        <%= b.id_barang %>
+                                                    </td>
+                                                    <td style="width:100px">
+                                                        <% if (b.photo_path) { %>
+                                                            <img src="<%= b.photo_path %>"
+                                                                alt="foto <%= b.nama_barang %>"
+                                                                style="max-width:80px; max-height:60px; object-fit:cover; border-radius:4px;">
+                                                            <% } else { %>
+                                                                <span class="text-muted">-</span>
+                                                                <% } %>
+                                                    </td>
+                                                    <td>
+                                                        <%= b.nama_barang %>
+                                                    </td>
+                                                    <td>
+                                                        <%= b.jumlah_total %>
+                                                    </td>
+                                                    <td>
+                                                        <%= b.stok_tersedia %>
+                                                    </td>
+                                                    <td>
+                                                        <%= b.satuan_jumlah || '-' %>
+                                                    </td>
+                                                    <td>Rp <%= (b.harga_dasar_sewa || 0).toLocaleString() %>
+                                                    </td>
+                                                    <td>
+                                                        <a href="/barang/detail/<%= b.id_barang %>"
+                                                            class="btn btn-sm btn-info">Detail</a>
+                                                        <% if (isAdmin) { %>
+                                                            <a href="/barang/edit/<%= b.id_barang %>"
+                                                                class="btn btn-sm btn-warning">Edit</a>
+                                                            <form action="/barang/delete/<%= b.id_barang %>"
+                                                                method="post" style="display:inline"
+                                                                onsubmit="return confirm('Hapus barang ini?');">
+                                                                <button class="btn btn-sm btn-danger">Hapus</button>
+                                                            </form>
+                                                            <% } %>
+                                                    </td>
+                                                </tr>
+                                                <% }); %>
+                                                    <% } else { %>
+                                                        <tr>
+                                                            <td colspan="8" class="text-center">Tidak ada data</td>
+                                                        </tr>
+                                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
         </div>
 
-        <% if (typeof error !=='undefined' && error) { %>
-            <div class="alert alert-danger">
-                <%= error %>
-            </div>
-            <% } %>
-                <% if (typeof success !=='undefined' && success) { %>
-                    <div class="alert alert-success">
-                        <%= success %>
-                    </div>
-                    <% } %>
-
-                        <form class="mb-3" method="get" action="/barang/list-barang">
-                            <div class="input-group">
-                                <input type="text" name="q" class="form-control" placeholder="Cari nama atau id..."
-                                    value="<%= filter_q || '' %>">
-                                <button class="btn btn-outline-secondary" type="submit">Cari</button>
-                            </div>
-                        </form>
-
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Nama Barang</th>
-                                        <th>Jumlah Total</th>
-                                        <th>Stok Tersedia</th>
-                                        <th>Satuan</th>
-                                        <th>Harga Sewa</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% if (records && records.length) { %>
-                                        <% records.forEach(function(b) { %>
-                                            <tr>
-                                                <td>
-                                                    <%= b.id_barang %>
-                                                </td>
-                                                <td>
-                                                    <%= b.nama_barang %>
-                                                </td>
-                                                <td>
-                                                    <%= b.jumlah_total %>
-                                                </td>
-                                                <td>
-                                                    <%= b.stok_tersedia %>
-                                                </td>
-                                                <td>
-                                                    <%= b.satuan_jumlah || '-' %>
-                                                </td>
-                                                <td>Rp <%= (b.harga_dasar_sewa || 0).toLocaleString() %>
-                                                </td>
-                                                <td>
-                                                    <a href="/barang/detail/<%= b.id_barang %>"
-                                                        class="btn btn-sm btn-info">Detail</a>
-
-                                                    <% if (isAdmin) { %>
-                                                        <a href="/barang/edit/<%= b.id_barang %>"
-                                                            class="btn btn-sm btn-warning">Edit</a>
-                                                        <form action="/barang/delete/<%= b.id_barang %>" method="post"
-                                                            style="display:inline"
-                                                            onsubmit="return confirm('Hapus barang ini?');">
-                                                            <button class="btn btn-sm btn-danger">Hapus</button>
-                                                        </form>
-                                                        <% } %>
-                                                </td>
-                                            </tr>
-                                            <% }); %>
-                                                <% } else { %>
-                                                    <tr>
-                                                        <td colspan="7" class="text-center">Tidak ada data</td>
-                                                    </tr>
-                                                    <% } %>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <%- include('../../partials/footer.ejs') %>
+        <%- include('../../partials/footer.ejs') %>

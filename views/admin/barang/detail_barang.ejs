@@ -6,42 +6,58 @@
         <div class="container mt-4">
             <h2>Detail Barang</h2>
 
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <%= barang.nama_barang %> <small class="text-muted">(ID: <%= barang.id_barang %>)</small>
-                    </h5>
+            <div class="card mb-4">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <% if (barang.photo_path) { %>
+                            <img src="<%= barang.photo_path %>" class="img-fluid rounded-start"
+                                alt="Foto <%= barang.nama_barang %>">
+                            <% } else { %>
+                                <div class="d-flex align-items-center justify-content-center"
+                                    style="height:220px; background:#f5f5f5;">
+                                    <span class="text-muted">No image</span>
+                                </div>
+                                <% } %>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <%= barang.nama_barang %> <small class="text-muted">(ID: <%= barang.id_barang %>
+                                            )</small>
+                            </h5>
 
-                    <dl class="row">
-                        <dt class="col-sm-3">Jumlah Total</dt>
-                        <dd class="col-sm-9">
-                            <%= barang.jumlah_total %>
-                        </dd>
+                            <dl class="row">
+                                <dt class="col-sm-4">Jumlah Total</dt>
+                                <dd class="col-sm-8">
+                                    <%= barang.jumlah_total %>
+                                </dd>
 
-                        <dt class="col-sm-3">Stok Tersedia</dt>
-                        <dd class="col-sm-9">
-                            <%= barang.stok_tersedia %>
-                        </dd>
+                                <dt class="col-sm-4">Stok Tersedia</dt>
+                                <dd class="col-sm-8">
+                                    <%= barang.stok_tersedia %>
+                                </dd>
 
-                        <dt class="col-sm-3">Satuan</dt>
-                        <dd class="col-sm-9">
-                            <%= barang.satuan_jumlah || '-' %>
-                        </dd>
+                                <dt class="col-sm-4">Satuan</dt>
+                                <dd class="col-sm-8">
+                                    <%= barang.satuan_jumlah || '-' %>
+                                </dd>
 
-                        <dt class="col-sm-3">Harga Dasar Sewa</dt>
-                        <dd class="col-sm-9">Rp <%= (barang.harga_dasar_sewa || 0).toLocaleString() %>
-                        </dd>
-                    </dl>
+                                <dt class="col-sm-4">Harga Dasar Sewa</dt>
+                                <dd class="col-sm-8">Rp <%= (barang.harga_dasar_sewa || 0).toLocaleString() %>
+                                </dd>
+                            </dl>
 
-                    <% if (isAdmin) { %>
-                        <a href="/barang/edit/<%= barang.id_barang %>" class="btn btn-warning">Edit</a>
-                        <form action="/barang/delete/<%= barang.id_barang %>" method="post" style="display:inline"
-                            onsubmit="return confirm('Hapus barang ini?');">
-                            <button class="btn btn-danger">Hapus</button>
-                        </form>
-                        <% } %>
+                            <% if (isAdmin) { %>
+                                <a href="/barang/edit/<%= barang.id_barang %>" class="btn btn-warning">Edit</a>
+                                <form action="/barang/delete/<%= barang.id_barang %>" method="post"
+                                    style="display:inline" onsubmit="return confirm('Hapus barang ini?');">
+                                    <button class="btn btn-danger">Hapus</button>
+                                </form>
+                                <% } %>
 
-                            <a href="/barang/list-barang" class="btn btn-secondary">Kembali</a>
+                                    <a href="/barang/list-barang" class="btn btn-secondary">Kembali</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

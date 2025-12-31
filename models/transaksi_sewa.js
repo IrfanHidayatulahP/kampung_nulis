@@ -24,7 +24,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     },
     status_transaksi: {
-      type: DataTypes.ENUM('aktif','terlambat','selesai'),
+      type: DataTypes.ENUM('aktif','terlambat','selesai','draft'),
       allowNull: false
     },
     total_biaya_sewa: {
@@ -38,6 +38,7 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'transaksi_sewa',
+    hasTrigger: true,
     timestamps: false,
     indexes: [
       {

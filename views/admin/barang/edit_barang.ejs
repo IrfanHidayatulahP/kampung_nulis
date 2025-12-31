@@ -21,7 +21,8 @@
                                 <div class="alert alert-warning">Anda tidak memiliki izin untuk mengedit barang.</div>
                                 <a href="/barang/list-barang" class="btn btn-secondary">Kembali</a>
                                 <% } else { %>
-                                    <form method="post" action="/barang/edit/<%= barang.id_barang %>">
+                                    <form method="post" action="/barang/edit/<%= barang.id_barang %>"
+                                        enctype="multipart/form-data">
                                         <div class="mb-3">
                                             <label class="form-label">Nama Barang</label>
                                             <input type="text" name="nama_barang" class="form-control"
@@ -50,6 +51,23 @@
                                             <label class="form-label">Harga Dasar Sewa (Rp)</label>
                                             <input type="number" name="harga_dasar_sewa" class="form-control" min="0"
                                                 value="<%= barang.harga_dasar_sewa %>" required>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Foto Saat Ini</label><br>
+                                            <% if (barang.photo_path) { %>
+                                                <img src="<%= barang.photo_path %>" alt="Foto <%= barang.nama_barang %>"
+                                                    style="max-width:160px; max-height:120px; object-fit:cover; border-radius:6px;">
+                                                <% } else { %>
+                                                    <div class="text-muted">Belum ada foto</div>
+                                                    <% } %>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="photo" class="form-label">Ganti Foto (opsional)</label>
+                                            <input class="form-control" type="file" id="photo" name="photo"
+                                                accept="image/*">
+                                            <div class="form-text">Kosongkan jika tidak ingin mengganti foto.</div>
                                         </div>
 
                                         <div class="d-flex gap-2">
