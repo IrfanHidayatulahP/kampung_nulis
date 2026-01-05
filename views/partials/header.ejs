@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
     <title>
         <%= (typeof title !=='undefined' && title) ? title : 'Portal Kampung Nulis' %>
     </title>
@@ -508,30 +509,6 @@
                         </button>
                         <div class="sidebar-submenu" id="submenu-transaksi-sewa">
                             <a href="/transaksi/list-transaksi">Daftar Transaksi</a>
-                        </div>
-                    </div>
-
-                    <!-- Detail Transaksi -->
-                    <div class="sidebar-menu-item">
-                        <button onclick="toggleSubmenu('detail-transaksi')" aria-expanded="false"
-                            aria-controls="submenu-detail-transaksi">
-                            <span>💰 Detail Transaksi</span>
-                            <span class="chevron" id="chevron-detail-transaksi">▼</span>
-                        </button>
-                        <div class="sidebar-submenu" id="submenu-detail-transaksi">
-                            <a href="/detail-transaksi/list-detail">List Detail Transaksi</a>
-                        </div>
-                    </div>
-
-                    <!-- Rusak / Hilang -->
-                    <div class="sidebar-menu-item">
-                        <button onclick="toggleSubmenu('rusak-hilang')" aria-expanded="false"
-                            aria-controls="submenu-rusak-hilang">
-                            <span>🧰 Rusak / Hilang</span>
-                            <span class="chevron" id="chevron-rusak-hilang">▼</span>
-                        </button>
-                        <div class="sidebar-submenu" id="submenu-rusak-hilang">
-                            <a href="/rusak-hilang/list">List Rusak / Hilang</a>
                         </div>
                     </div>
 

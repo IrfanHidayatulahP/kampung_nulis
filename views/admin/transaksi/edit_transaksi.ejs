@@ -1,70 +1,653 @@
 <%- include('../../partials/header.ejs') %>
-    <div class="container mt-4">
-        <h2>Edit Transaksi #<%= transaksi.id_transaksi %>
-        </h2>
 
-        <% if (error) { %>
-            <div class="alert alert-danger">
-                <%= error %>
+    <div class="main-content-wrapper">
+        <div class="container">
+            <div class="form-card">
+                <div class="form-header">
+                    <div class="header-title">
+                        <span class="icon">📝</span>
+                        <div>
+                            <h2>Edit Transaksi</h2>
+                            <p>Kelola data penyewaan dan detail barang #<%= transaksi.id_transaksi %>
+                            </p>
+                        </div>
+                    </div>
+                    <a href="/transaksi/list-transaksi" class="btn-close-form">&times;</a>
+                </div>
+
+                <div class="form-body">
+                    <% if (typeof error !=='undefined' && error) { %>
+                        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <%= error %>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
+                        </div>
+                        <% } %>
+
+                            <form method="post" action="/transaksi/edit/<%= transaksi.id_transaksi %>"
+                                id="editTransaksiForm">
+                                <h5 class="section-title mb-3 text-primary"><i
+                                        class="bi bi-person-lines-fill me-2"></i>Informasi Utama</h5>
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Peminjam</label>
+                                        <select name="username" class="form-select custom-input" required>
+                                            <% peminjamOptions.forEach(p=> { %>
+                                                <option value="<%= p.username %>" <%=p.username===transaksi.username
+                                                    ? 'selected' : '' %>>
+                                                    <%= p.username %> - <%= p.nama_lengkap || '' %>
+                                                </option>
+                                                <% }) %>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Status Transaksi</label>
+                                        <select name="status_transaksi" class="form-select custom-input" required>
+                                            <% ['pending', 'aktif' , 'selesai' , 'dibatalkan' ].forEach(s=> { %>
+                                                <option value="<%= s %>" <%=s===transaksi.status_transaksi ? 'selected'
+                                                    : '' %>><%= s.toUpperCase() %>
+                                                </option>
+                                                <% }) %>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Tanggal Sewa</label>
+                                        <input type="date" name="tgl_sewa" class="form-control custom-input"
+                                            value="<%= transaksi.tgl_sewa %>" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Tanggal Pengembalian</label>
+                                        <input type="date" name="tgl_pengembalian" class="form-control custom-input"
+                                            value="<%= transaksi.tgl_pengembalian || '' %>">
+                                    </div>
+                                </div>
+
+                                <hr class="my-4 separator">
+
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="section-title m-0 text-primary">
+                                        <i class="bi bi-box-seam me-2"></i>Detail Barang Sewa
+                                    </h5>
+                                    <button type="button" id="btnAddRow" class="btn btn-add-item">
+                                        <span>+</span> Tambah Item
+                                    </button>
+                                </div>
+
+                                <div class="items-container mb-4" id="detailItemsContainer">
+                                    <% details.forEach(function(d, idx) { const harga=Number(d.harga_sewa_per_satuan ||
+                                        (d.barang && d.barang.harga_dasar_sewa) || 0); const jumlah=Number(d.jumlah_sewa
+                                        || 0); const dendaDefault=Number((d.rusak_hilang_data &&
+                                        d.rusak_hilang_data.biaya_denda_per_item) || (d.barang &&
+                                        d.barang.harga_ganti_barang) || 0); const
+                                        subtotalDenda=Number((d.rusak_hilang_data && d.rusak_hilang_data.subtotal_denda)
+                                        || ((d.rusak_hilang_data && (Number(d.rusak_hilang_data.jumlah_rusak||0) +
+                                        Number(d.rusak_hilang_data.jumlah_hilang||0)) * dendaDefault) || 0)); %>
+                                        <div class="item-card-row mb-3">
+                                            <div class="row align-items-center g-3">
+                                                <div class="col-md-5">
+                                                    <label class="small text-muted mb-1 d-md-none">Nama Barang</label>
+                                                    <div class="input-group">
+                                                        <span
+                                                            class="input-group-text bg-white border-end-0 text-muted"><i
+                                                                class="bi bi-tag"></i></span>
+                                                        <input type="hidden" name="detail_id[]"
+                                                            value="<%= d.id_detail %>">
+                                                        <select name="detail_id_barang[]"
+                                                            class="form-select custom-input-sm border-start-0 barang-select"
+                                                            required>
+                                                            <option value="">-- Pilih Barang --</option>
+                                                            <% barangs.forEach(b=> { %>
+                                                                <option value="<%= b.id_barang %>"
+                                                                    data-harga="<%= b.harga_dasar_sewa %>"
+                                                                    data-denda="<%= b.harga_ganti_barang || 0 %>"
+                                                                    <%=b.id_barang===d.id_barang ? 'selected' : '' %>>
+                                                                    <%= b.nama_barang %>
+                                                                </option>
+                                                                <% }) %>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-6 col-md-2">
+                                                    <label
+                                                        class="small text-muted mb-1 d-md-none text-center d-block">Jumlah</label>
+                                                    <div class="input-group">
+                                                        <input type="number" name="detail_qty[]" value="<%= jumlah %>"
+                                                            class="form-control custom-input-sm text-center qty-input"
+                                                            min="1" required>
+                                                        <span class="input-group-text bg-light small">Unit</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-6 col-md-2">
+                                                    <label
+                                                        class="small text-muted mb-1 d-md-none text-center d-block">Harga
+                                                        Satuan</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text bg-light small">Rp</span>
+                                                        <input type="number" name="detail_harga_per_satuan[]"
+                                                            value="<%= harga %>"
+                                                            class="form-control custom-input-sm harga-input" required>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-10 col-md-2 text-md-end">
+                                                    <label class="small text-muted mb-1 d-md-none">Subtotal</label>
+                                                    <div class="subtotal-display">
+                                                        <strong class="text-dark subtotal-cell">Rp <%= (jumlah *
+                                                                harga).toLocaleString('id-ID') %></strong>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-2 col-md-1 text-end">
+                                                    <button type="button" class="btn btn-remove-item btn-remove-row">
+                                                        <i class="bi bi-trash-fill"></i>
+                                                    </button>
+                                                </div>
+
+                                                <!-- INPUT RUSAK / HILANG / DENDA per baris -->
+                                                <div class="col-12 mt-2">
+                                                    <div class="condition-status-box">
+                                                        <div class="row g-2 align-items-center">
+                                                            <div class="col-md-3">
+                                                                <div
+                                                                    class="input-group input-group-sm custom-input-group">
+                                                                    <span
+                                                                        class="input-group-text bg-white text-danger border-end-0"><i
+                                                                            class="bi bi-wrench-adjustable"></i></span>
+                                                                    <input type="number" name="detail_rusak[]"
+                                                                        class="form-control border-start-0 qty-rusak-input"
+                                                                        min="0"
+                                                                        value="<%= (d.rusak_hilang_data && d.rusak_hilang_data.jumlah_rusak) ? d.rusak_hilang_data.jumlah_rusak : 0 %>"
+                                                                        placeholder="Rusak">
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-3">
+                                                                <div
+                                                                    class="input-group input-group-sm custom-input-group">
+                                                                    <span
+                                                                        class="input-group-text bg-white text-warning border-end-0"><i
+                                                                            class="bi bi-question-square"></i></span>
+                                                                    <input type="number" name="detail_hilang[]"
+                                                                        class="form-control border-start-0 qty-hilang-input"
+                                                                        min="0"
+                                                                        value="<%= (d.rusak_hilang_data && d.rusak_hilang_data.jumlah_hilang) ? d.rusak_hilang_data.jumlah_hilang : 0 %>"
+                                                                        placeholder="Hilang">
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-3">
+                                                                <div
+                                                                    class="input-group input-group-sm custom-input-group">
+                                                                    <span
+                                                                        class="input-group-text bg-white text-primary border-end-0"><i
+                                                                            class="bi bi-currency-dollar"></i></span>
+                                                                    <input type="number" name="detail_denda[]"
+                                                                        class="form-control border-start-0 denda-input"
+                                                                        min="0" value="<%= dendaDefault %>"
+                                                                        placeholder="Denda / Item">
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-3 text-end">
+                                                                <div class="small text-muted">Subtotal Denda</div>
+                                                                <div class="fw-bold denda-subtotal-cell">Rp <%=
+                                                                        subtotalDenda.toLocaleString('id-ID') %>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-3 text-end">
+                                                                <div class="small text-muted">Total Barang (Sewa +
+                                                                    Denda)</div>
+                                                                <div class="fw-bold combined-cell">Rp <%= ((jumlah *
+                                                                        harga) + subtotalDenda).toLocaleString('id-ID')
+                                                                        %>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <% }) %>
+                                </div>
+
+                                <div class="payment-summary-card">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-6 mb-3 mb-md-0">
+                                            <label class="small fw-bold text-muted mb-2 d-block">Uang Muka (DP)</label>
+                                            <div class="input-group w-75">
+                                                <span
+                                                    class="input-group-text bg-white border-end-0 text-muted small">Rp</span>
+                                                <input type="number" name="total_dp"
+                                                    class="form-control custom-input border-start-0"
+                                                    value="<%= transaksi.total_dp || 0 %>">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 text-md-end">
+                                            <div class="total-label text-muted small fw-bold">TOTAL KESELURUHAN (SEWA)
+                                            </div>
+                                            <div class="total-value" id="grandTotalPreview">Rp <%=
+                                                    (transaksi.total_biaya_sewa || 0).toLocaleString('id-ID') %>
+                                            </div>
+                                            <input type="hidden" name="computed_grand_total" id="computed_grand_total"
+                                                value="<%= transaksi.total_biaya_sewa || 0 %>">
+
+                                            <div class="mt-2 small text-muted">TOTAL DENDA</div>
+                                            <div class="fw-bold" id="penaltyTotalPreview">Rp 0</div>
+                                            <input type="hidden" name="computed_total_penalty"
+                                                id="computed_total_penalty" value="0">
+
+                                            <div class="mt-2 small text-muted">GRAND TOTAL (SEWA + DENDA)</div>
+                                            <div class="fw-bold" id="combinedTotalPreview">Rp 0</div>
+                                            <input type="hidden" name="computed_grand_with_penalty"
+                                                id="computed_grand_with_penalty" value="0">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-actions mt-4">
+                                    <button type="submit" class="btn-update">
+                                        <span>💾</span> Simpan Perubahan
+                                    </button>
+                                    <a href="/transaksi/list-transaksi" class="btn-cancel">Batal</a>
+                                </div>
+                            </form>
+                </div>
             </div>
-            <% } %>
-
-                <form method="post" action="/transaksi/edit/<%= transaksi.id_transaksi %>">
-                    <div class="mb-3">
-                        <label class="form-label">Username</label>
-                        <% if (peminjamOptions && peminjamOptions.length) { %>
-                            <select name="username" class="form-control" required>
-                                <% peminjamOptions.forEach(p=> { %>
-                                    <option value="<%= p.username %>" <%=p.username===transaksi.username ? 'selected'
-                                        : '' %>><%= p.username %> - <%= p.nama_lengkap || '' %>
-                                    </option>
-                                    <% }) %>
-                            </select>
-                            <% } else { %>
-                                <input type="text" name="username" class="form-control"
-                                    value="<%= transaksi.username %>" required>
-                                <% } %>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Tanggal Sewa</label>
-                            <input type="date" name="tgl_sewa" class="form-control" value="<%= transaksi.tgl_sewa %>"
-                                required>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Tanggal Pengembalian</label>
-                            <input type="date" name="tgl_pengembalian" class="form-control"
-                                value="<%= transaksi.tgl_pengembalian || '' %>">
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Status</label>
-                            <select name="status_transaksi" class="form-control" required>
-                                <% statusOptions.forEach(s=> { %>
-                                    <option value="<%= s %>" <%=s===transaksi.status_transaksi ? 'selected' : '' %>><%=
-                                            s %>
-                                    </option>
-                                    <% }) %>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Total Biaya Sewa</label>
-                        <input type="number" name="total_biaya_sewa" class="form-control" min="0"
-                            value="<%= transaksi.total_biaya_sewa || 0 %>">
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Total DP</label>
-                        <input type="number" name="total_dp" class="form-control" min="0"
-                            value="<%= transaksi.total_dp || 0 %>">
-                    </div>
-
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-success">Simpan</button>
-                        <a href="/transaksi/list-transaksi" class="btn btn-secondary">Batal</a>
-                    </div>
-                </form>
+        </div>
     </div>
+
+    <style>
+        /* (style sama seperti sebelumnya, tidak diubah) */
+        .main-content-wrapper {
+            padding: 100px 15px 50px 15px;
+            background-color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        .form-card {
+            background: white;
+            max-width: 900px;
+            margin: 0 auto;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .form-header {
+            background: #ffffff;
+            padding: 25px 30px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-title .icon {
+            font-size: 2rem;
+            background: #eff6ff;
+            padding: 10px;
+            border-radius: 12px;
+        }
+
+        .header-title h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #1e293b;
+            font-weight: 700;
+        }
+
+        .header-title p {
+            margin: 0;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .btn-close-form {
+            text-decoration: none;
+            color: #94a3b8;
+            font-size: 2rem;
+            line-height: 1;
+            transition: 0.2s;
+        }
+
+        .btn-close-form:hover {
+            color: #ef4444;
+        }
+
+        .form-body {
+            padding: 30px;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .custom-input {
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 10px 15px;
+            transition: 0.3s;
+        }
+
+        .separator {
+            opacity: 0.1;
+        }
+
+        .item-card-row {
+            background: #ffffff;
+            border: 1.5px solid #f1f5f9;
+            border-radius: 12px;
+            padding: 15px;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .item-card-row:hover {
+            border-color: #cbd5e1;
+            background: #fafafa;
+        }
+
+        .custom-input-sm {
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 0.9rem;
+        }
+
+        .btn-add-item {
+            background: #eff6ff;
+            color: #2563eb;
+            border: 1px dashed #2563eb;
+            border-radius: 8px;
+            padding: 8px 20px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .btn-remove-item {
+            color: #94a3b8;
+            background: #f8fafc;
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+
+        .condition-status-box {
+            background: #fdfdfd;
+            border: 1px dashed #cbd5e1;
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .custom-input-group {
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .custom-input-group .form-control {
+            border: none;
+            height: 45px;
+            font-size: 0.9rem;
+        }
+
+        .payment-summary-card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .total-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #2563eb;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            padding: 20px 0;
+        }
+
+        .btn-update {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            flex: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .btn-cancel {
+            background: #f1f5f9;
+            color: #475569;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            flex: 1;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        @media (max-width: 768px) {
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .item-card-row {
+                border-left: 4px solid #3b82f6;
+            }
+        }
+    </style>
+
+    <script>
+        (function () {
+            // formatting helpers
+            const fmtRupiah = n => {
+                const x = Math.round(Number(n) || 0);
+                return x.toLocaleString('id-ID', { maximumFractionDigits: 0 });
+            };
+            const cleanNumber = v => {
+                if (v === null || v === undefined) return 0;
+                if (typeof v === 'number') return Math.round(v);
+                // remove non-digit except minus/decimal, then parse float
+                const s = String(v).replace(/[^\d.-]/g, '');
+                if (s === '') return 0;
+                return Math.round(Number(s) || 0);
+            };
+
+            // DOM refs (summary area IDs expected in template)
+            const rentPreview = document.getElementById('grandTotalPreview');         // TOTAL SEWA
+            const penaltyPreview = document.getElementById('penaltyTotalPreview');   // TOTAL DENDA
+            const combinedPreview = document.getElementById('combinedTotalPreview'); // GRAND TOTAL (sewa + denda)
+
+            // hidden input fields (for server) if present
+            const hiddenGrand = document.getElementById('computed_grand_total');
+            const hiddenPenalty = document.getElementById('computed_total_penalty');
+            const hiddenCombined = document.getElementById('computed_grand_with_penalty');
+
+            // DP input (by name). If you gave the input an id, script will still find it by name.
+            const dpInput = document.querySelector('input[name="total_dp"]');
+
+            // create or find element to show GRAND TOTAL after DP
+            function ensureAfterDpElement() {
+                // prefer explicit element with id combinedAfterDpPreview
+                let el = document.getElementById('combinedAfterDpPreview');
+                if (el) return el;
+
+                // fallback: try to append under combinedPreview's parent (if exists)
+                if (combinedPreview && combinedPreview.parentElement) {
+                    const wrapper = document.createElement('div');
+                    wrapper.style.marginTop = '8px';
+                    wrapper.innerHTML = `
+        <div class="small text-muted">GRAND TOTAL (SETELAH DP)</div>
+        <div class="fw-bold" id="combinedAfterDpPreview">Rp 0</div>
+      `;
+                    combinedPreview.parentElement.appendChild(wrapper);
+                    return document.getElementById('combinedAfterDpPreview');
+                }
+
+                // last fallback: create at body end
+                el = document.createElement('div');
+                el.id = 'combinedAfterDpPreview';
+                el.innerText = 'Rp 0';
+                document.body.appendChild(el);
+                return el;
+            }
+
+            const afterDpPreview = ensureAfterDpElement();
+
+            // get all item rows
+            function getRows() {
+                return Array.from(document.querySelectorAll('.item-card-row'));
+            }
+
+            // compute totals from rows
+            function computeTotalsFromRows() {
+                let totalRent = 0;
+                let totalPenalty = 0;
+                getRows().forEach(row => {
+                    // read values from row (classes must match your template)
+                    const qty = cleanNumber(row.querySelector('.qty-input')?.value);
+                    const price = cleanNumber(row.querySelector('.harga-input')?.value);
+                    const rusak = cleanNumber(row.querySelector('.qty-rusak-input')?.value);
+                    const hilang = cleanNumber(row.querySelector('.qty-hilang-input')?.value);
+                    const denda = cleanNumber(row.querySelector('.denda-input')?.value);
+
+                    // cap rusak+hilang <= qty (defensive), do not modify UI here
+                    const validFault = Math.min(qty, rusak + hilang);
+                    const penaltySub = validFault * denda;
+                    const rentSub = qty * price;
+
+                    totalRent += rentSub;
+                    totalPenalty += penaltySub;
+
+                    // also update per-row cells so UI per-item is consistent
+                    const rentCell = row.querySelector('.subtotal-cell');
+                    const penCell = row.querySelector('.denda-subtotal-cell');
+                    const combCell = row.querySelector('.combined-cell');
+                    if (rentCell) rentCell.innerText = 'Rp ' + fmtRupiah(rentSub);
+                    if (penCell) penCell.innerText = 'Rp ' + fmtRupiah(penaltySub);
+                    if (combCell) combCell.innerText = 'Rp ' + fmtRupiah(rentSub + penaltySub);
+                });
+
+                return { totalRent, totalPenalty, totalCombined: totalRent + totalPenalty };
+            }
+
+            // main update function: recalc + update UI
+            function updateSummaryAndHidden() {
+                const totals = computeTotalsFromRows();
+                const dp = dpInput ? cleanNumber(dpInput.value) : 0;
+                const gross = totals.totalCombined;
+                const afterDp = Math.max(0, gross - dp);
+
+                // update UI text (use proper formatting)
+                if (rentPreview) rentPreview.innerText = 'Rp ' + fmtRupiah(totals.totalRent);
+                if (penaltyPreview) penaltyPreview.innerText = 'Rp ' + fmtRupiah(totals.totalPenalty);
+                if (combinedPreview) combinedPreview.innerText = 'Rp ' + fmtRupiah(gross);
+                if (afterDpPreview) afterDpPreview.innerText = 'Rp ' + fmtRupiah(afterDp);
+
+                // update hidden inputs for server-side (if exist)
+                if (hiddenGrand) hiddenGrand.value = totals.totalRent;
+                if (hiddenPenalty) hiddenPenalty.value = totals.totalPenalty;
+                if (hiddenCombined) hiddenCombined.value = gross;
+
+                // also set a hidden for combined after dp if you want server to receive it
+                let hAfter = document.getElementById('computed_grand_after_dp');
+                if (!hAfter) {
+                    hAfter = document.createElement('input');
+                    hAfter.type = 'hidden';
+                    hAfter.id = 'computed_grand_after_dp';
+                    hAfter.name = 'computed_grand_after_dp';
+                    document.querySelector('form#editTransaksiForm')?.appendChild(hAfter);
+                }
+                hAfter.value = afterDp;
+            }
+
+            // wire events: all row inputs + dp input
+            function wireRealtime() {
+                // row-level inputs
+                getRows().forEach(row => {
+                    ['.qty-input', '.harga-input', '.qty-rusak-input', '.qty-hilang-input', '.denda-input', '.barang-select'].forEach(sel => {
+                        const el = row.querySelector(sel);
+                        if (!el) return;
+                        el.addEventListener('input', () => updateSummaryAndHidden());
+                        el.addEventListener('change', () => updateSummaryAndHidden());
+                        el.addEventListener('blur', () => updateSummaryAndHidden());
+                    });
+                });
+
+                // observe dynamic added rows (if you add rows via JS)
+                const container = document.getElementById('detailItemsContainer');
+                if (container) {
+                    const observer = new MutationObserver(muts => {
+                        muts.forEach(m => {
+                            m.addedNodes.forEach(n => {
+                                if (!(n instanceof HTMLElement)) return;
+                                if (n.matches && n.matches('.item-card-row') || n.querySelector && n.querySelector('.item-card-row')) {
+                                    // wire new row's inputs
+                                    const row = n.matches('.item-card-row') ? n : n.querySelector('.item-card-row');
+                                    if (row) {
+                                        ['.qty-input', '.harga-input', '.qty-rusak-input', '.qty-hilang-input', '.denda-input', '.barang-select'].forEach(sel => {
+                                            const el = row.querySelector(sel);
+                                            if (!el) return;
+                                            el.addEventListener('input', () => updateSummaryAndHidden());
+                                            el.addEventListener('change', () => updateSummaryAndHidden());
+                                            el.addEventListener('blur', () => updateSummaryAndHidden());
+                                        });
+                                        // compute once for the new row
+                                        updateSummaryAndHidden();
+                                    }
+                                }
+                            });
+                        });
+                    });
+                    observer.observe(container, { childList: true, subtree: true });
+                }
+
+                // DP input
+                if (dpInput) {
+                    dpInput.addEventListener('input', updateSummaryAndHidden);
+                    dpInput.addEventListener('change', updateSummaryAndHidden);
+                    dpInput.addEventListener('blur', updateSummaryAndHidden);
+                }
+
+                // initial calc
+                updateSummaryAndHidden();
+            }
+
+            // run on DOM ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', wireRealtime);
+            } else {
+                wireRealtime();
+            }
+        })();
+    </script>
+
     <%- include('../../partials/footer.ejs') %>

@@ -1,81 +1,312 @@
 <%- include('../../partials/header.ejs') %>
+
     <% const rawRole=(typeof user !=='undefined' && (user.role || user.status)) || '' ; const
         roleNorm=String(rawRole).toLowerCase().replace(/\s+/g,'').replace(/[_-]/g,''); const isAdmin=roleNorm==='admin'
         ; %>
 
-        <div class="container mt-4">
-            <h2>Edit Barang</h2>
-
-            <% if (typeof error !=='undefined' && error) { %>
-                <div class="alert alert-danger">
-                    <%= error %>
-                </div>
-                <% } %>
-                    <% if (typeof success !=='undefined' && success) { %>
-                        <div class="alert alert-success">
-                            <%= success %>
+        <div class="main-content-wrapper">
+            <div class="container">
+                <div class="form-card">
+                    <div class="form-header">
+                        <div class="header-title">
+                            <span class="icon">✏️</span>
+                            <div>
+                                <h2>Edit Barang</h2>
+                                <p>Perbarui informasi detail inventaris barang</p>
+                            </div>
                         </div>
-                        <% } %>
+                        <a href="/barang/list-barang" class="btn-close-form">&times;</a>
+                    </div>
 
-                            <% if (!isAdmin) { %>
-                                <div class="alert alert-warning">Anda tidak memiliki izin untuk mengedit barang.</div>
-                                <a href="/barang/list-barang" class="btn btn-secondary">Kembali</a>
-                                <% } else { %>
-                                    <form method="post" action="/barang/edit/<%= barang.id_barang %>"
-                                        enctype="multipart/form-data">
-                                        <div class="mb-3">
-                                            <label class="form-label">Nama Barang</label>
-                                            <input type="text" name="nama_barang" class="form-control"
-                                                value="<%= barang.nama_barang %>" required>
-                                        </div>
+                    <div class="form-body">
+                        <% if (typeof error !=='undefined' && error) { %>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                <%= error %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                            </div>
+                            <% } %>
 
-                                        <div class="row">
-                                            <div class="col-md-4 mb-3">
-                                                <label class="form-label">Jumlah Total</label>
-                                                <input type="number" name="jumlah_total" class="form-control" min="0"
-                                                    value="<%= barang.jumlah_total %>" required>
+                                <% if (!isAdmin) { %>
+                                    <div class="empty-state">
+                                        <div class="icon">🚫</div>
+                                        <h4>Akses Ditolak</h4>
+                                        <p>Anda tidak memiliki izin untuk mengedit data barang.</p>
+                                        <a href="/barang/list-barang" class="btn btn-secondary">Kembali ke Daftar</a>
+                                    </div>
+                                    <% } else { %>
+                                        <form method="post" action="/barang/edit/<%= barang.id_barang %>"
+                                            enctype="multipart/form-data">
+
+                                            <div class="mb-4">
+                                                <label class="form-label fw-bold">Nama Barang</label>
+                                                <input type="text" name="nama_barang"
+                                                    class="form-control form-control-lg custom-input"
+                                                    value="<%= barang.nama_barang %>"
+                                                    placeholder="Contoh: Kamera Sony A7III" required>
                                             </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label class="form-label">Stok Tersedia</label>
-                                                <input type="number" name="stok_tersedia" class="form-control" min="0"
-                                                    value="<%= barang.stok_tersedia %>" required>
+
+                                            <div class="row">
+                                                <div class="col-md-4 mb-4">
+                                                    <label class="form-label fw-bold">Jumlah Total</label>
+                                                    <input type="number" name="jumlah_total"
+                                                        class="form-control custom-input" min="0"
+                                                        value="<%= barang.jumlah_total %>" required>
+                                                </div>
+                                                <div class="col-md-4 mb-4">
+                                                    <label class="form-label fw-bold">Stok Tersedia</label>
+                                                    <input type="number" name="stok_tersedia"
+                                                        class="form-control custom-input" min="0"
+                                                        value="<%= barang.stok_tersedia %>" required>
+                                                </div>
+                                                <div class="col-md-4 mb-4">
+                                                    <label class="form-label fw-bold">Satuan</label>
+                                                    <input type="text" name="satuan_jumlah"
+                                                        class="form-control custom-input"
+                                                        value="<%= barang.satuan_jumlah %>" placeholder="Pcs / Unit">
+                                                </div>
                                             </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label class="form-label">Satuan</label>
-                                                <input type="text" name="satuan_jumlah" class="form-control"
-                                                    value="<%= barang.satuan_jumlah %>">
+
+                                            <div class="mb-4">
+                                                <label class="form-label fw-bold">Harga Dasar Sewa (Rp / Hari)</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-light border-end-0">Rp</span>
+                                                    <input type="number" name="harga_dasar_sewa"
+                                                        class="form-control border-start-0 custom-input" min="0"
+                                                        value="<%= barang.harga_dasar_sewa %>" required>
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        <div class="mb-3">
-                                            <label class="form-label">Harga Dasar Sewa (Rp)</label>
-                                            <input type="number" name="harga_dasar_sewa" class="form-control" min="0"
-                                                value="<%= barang.harga_dasar_sewa %>" required>
-                                        </div>
+                                            <hr class="my-4" style="opacity: 0.1;">
 
-                                        <div class="mb-3">
-                                            <label class="form-label">Foto Saat Ini</label><br>
-                                            <% if (barang.photo_path) { %>
-                                                <img src="<%= barang.photo_path %>" alt="Foto <%= barang.nama_barang %>"
-                                                    style="max-width:160px; max-height:120px; object-fit:cover; border-radius:6px;">
-                                                <% } else { %>
-                                                    <div class="text-muted">Belum ada foto</div>
-                                                    <% } %>
-                                        </div>
+                                            <div class="row align-items-center mb-4">
+                                                <div class="col-sm-auto mb-3 mb-sm-0">
+                                                    <label class="form-label fw-bold d-block">Foto Saat Ini</label>
+                                                    <div class="image-preview-box">
+                                                        <% if (barang.photo_path) { %>
+                                                            <img src="<%= barang.photo_path %>" alt="Foto">
+                                                            <% } else { %>
+                                                                <div class="no-image-placeholder">No Image</div>
+                                                                <% } %>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm">
+                                                    <label for="photo" class="form-label fw-bold">Ganti Foto
+                                                        Baru</label>
+                                                    <input class="form-control custom-file-input" type="file" id="photo"
+                                                        name="photo" accept="image/*">
+                                                    <div class="form-text mt-2 text-muted">Format: JPG, PNG, WEBP (Max
+                                                        2MB). Kosongkan jika tidak diganti.</div>
+                                                </div>
+                                            </div>
 
-                                        <div class="mb-3">
-                                            <label for="photo" class="form-label">Ganti Foto (opsional)</label>
-                                            <input class="form-control" type="file" id="photo" name="photo"
-                                                accept="image/*">
-                                            <div class="form-text">Kosongkan jika tidak ingin mengganti foto.</div>
-                                        </div>
-
-                                        <div class="d-flex gap-2">
-                                            <button class="btn btn-primary">Update</button>
-                                            <a href="/barang/list-barang" class="btn btn-secondary">Batal</a>
-                                        </div>
-                                    </form>
-                                    <% } %>
+                                            <div class="form-actions">
+                                                <button type="submit" class="btn-update">
+                                                    <span>💾</span> Simpan Perubahan
+                                                </button>
+                                                <a href="/barang/list-barang" class="btn-cancel">Batal</a>
+                                            </div>
+                                        </form>
+                                        <% } %>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <style>
+            /* Container Setup */
+            .main-content-wrapper {
+                padding: 100px 15px 50px 15px;
+                /* Menyesuaikan header fixed */
+                background-color: #f8fafc;
+                min-height: 100vh;
+            }
+
+            .form-card {
+                background: white;
+                max-width: 800px;
+                margin: 0 auto;
+                border-radius: 16px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+                overflow: hidden;
+                border: 1px solid #e2e8f0;
+            }
+
+            /* Header Form */
+            .form-header {
+                background: #ffffff;
+                padding: 25px 30px;
+                border-bottom: 1px solid #f1f5f9;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .form-actions {
+                display: flex;
+                gap: 12px;
+                margin-top: 30px;
+            }
+
+            .header-title {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .header-title .icon {
+                font-size: 2rem;
+                background: #eff6ff;
+                padding: 10px;
+                border-radius: 12px;
+            }
+
+            .header-title h2 {
+                margin: 0;
+                font-size: 1.5rem;
+                color: #1e293b;
+                font-weight: 700;
+            }
+
+            .header-title p {
+                margin: 0;
+                color: #64748b;
+                font-size: 0.9rem;
+            }
+
+            .btn-close-form {
+                text-decoration: none;
+                color: #94a3b8;
+                font-size: 2rem;
+                line-height: 1;
+                transition: 0.2s;
+            }
+
+            .btn-close-form:hover {
+                color: #ef4444;
+            }
+
+            /* Body Form */
+            .form-body {
+                padding: 30px;
+            }
+
+            .custom-input {
+                border: 1.5px solid #e2e8f0;
+                border-radius: 10px;
+                padding: 12px 15px;
+                transition: 0.3s;
+            }
+
+            .custom-input:focus {
+                border-color: #3b82f6;
+                box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+                outline: none;
+            }
+
+            /* Image Preview */
+            .image-preview-box {
+                width: 140px;
+                height: 140px;
+                border-radius: 12px;
+                overflow: hidden;
+                border: 2px dashed #cbd5e1;
+                background: #f8fafc;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .image-preview-box img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .no-image-placeholder {
+                color: #94a3b8;
+                font-size: 0.8rem;
+                font-weight: bold;
+            }
+
+            /* Buttons */
+            /* Styling Tombol Update */
+            .btn-update {
+                background: #2563eb;
+                color: white;
+                border: none;
+                padding: 12px 20px;
+                border-radius: 10px;
+                font-weight: 600;
+                flex: 2;
+                /* Simpan Perubahan lebih lebar */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                cursor: pointer;
+                white-space: nowrap;
+                /* Teks tidak turun baris */
+            }
+
+            /* Styling Tombol Batal */
+            .btn-cancel {
+                background: #f1f5f9;
+                color: #475569;
+                text-decoration: none;
+                padding: 12px 20px;
+                border-radius: 10px;
+                font-weight: 600;
+                flex: 1;
+                /* Batal lebih kecil */
+                text-align: center;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 1px solid #e2e8f0;
+            }
+
+            .btn-update:hover {
+                background: #1d4ed8;
+            }
+
+            .btn-cancel:hover {
+                background: #e2e8f0;
+            }
+
+            .empty-state {
+                text-align: center;
+                padding: 40px 0;
+            }
+
+            .empty-state .icon {
+                font-size: 3rem;
+                margin-bottom: 15px;
+            }
+
+            /* Responsive */
+            @media (max-width: 576px) {
+                .form-actions {
+                    flex-direction: column;
+                    /* Tombol jadi atas-bawah */
+                    width: 100%;
+                }
+
+                .btn-update,
+                .btn-cancel {
+                    flex: none;
+                    width: 100%;
+                    /* Tombol memenuhi lebar layar */
+                    padding: 15px;
+                    /* Lebih besar agar mudah ditekan di HP */
+                }
+
+                /* Agar tombol Batal di bawah tidak terpotong oleh margin kontainer */
+                .form-card {
+                    margin-bottom: 50px;
+                }
+            }
+        </style>
 
         <%- include('../../partials/footer.ejs') %>

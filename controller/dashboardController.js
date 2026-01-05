@@ -1,5 +1,11 @@
 // controllers/dashboardController.js
 const barangController = require('./barangController'); // sesuaikan path jika perlu
+const db = require('../config/db'); // sesuaikan path jika perlu
+const { Op } = require('sequelize');
+
+let Transaksi = db.transaksi_sewa || db.transaksiSewa || db.Transaksi_sewa || db.TransaksiSewa || (db.models && (db.models.transaksi_sewa || db.models.Transaksi_sewa));
+let Barang = db.barang || db.Barang || (db.models && (db.models.barang || db.models.Barang));
+let Peminjam = db.peminjam || db.Peminjam || (db.models && (db.models.peminjam || db.models.Peminjam));
 
 // Ambil status user dari session (safety)
 function getUserStatus(req) {
@@ -38,9 +44,51 @@ async function fetchItemsWithDisplayPrice(req, limit = 12) {
 /**
  * adminDashboard (tidak berubah)
  */
-exports.adminDashboard = (req, res) => {
-    const user = req.peminjam || req.session.user || null;
-    res.render('admin/dashboard_admin', { user });
+exports.adminDashboard = async (req, res) => {
+    try {
+        const user = req.peminjam || req.session.user || null;
+        const currentUsername = req.session.user ? req.session.user.username : null;
+        let userData = req.session.user;
+
+        if (currentUsername && Peminjam) {
+            userData = await Peminjam.findOne({ where: { username: currentUsername } });
+        }
+
+        // Eksekusi query count
+        const [jumlahPeminjam, jumlahTransaksi, jumlahBarangReady] = await Promise.all([
+            Peminjam ? Peminjam.count() : 0,
+            Transaksi ? Transaksi.count() : 0,
+            Barang ? Barang.count({
+                where: {
+                    // CEK DISINI: Ganti 'stok' dengan nama kolom yang benar di DB Anda
+                    // Biasanya 'stok_barang', 'stok', atau 'jumlah'
+                    [Op.or]: [
+                        { stok: { [Op.gt]: 0 } },
+                        { stok_barang: { [Op.gt]: 0 } }
+                    ]
+                }
+            }).catch(() => {
+                // Jika masih error karena nama kolom salah, hitung total semua barang saja
+                return Barang.count();
+            }) : 0
+        ]);
+
+        res.render('admin/dashboard_admin', {
+            user,
+            jumlahPeminjam,
+            jumlahTransaksi,
+            jumlahBarangReady
+        });
+    } catch (err) {
+        console.error('adminDashboard error:', err);
+        res.render('admin/dashboard_admin', {
+            user: req.session.user,
+            jumlahPeminjam: 0,
+            jumlahTransaksi: 0,
+            jumlahBarangReady: 0,
+            error: 'Gagal memuat statistik dashboard'
+        });
+    }
 };
 
 /**

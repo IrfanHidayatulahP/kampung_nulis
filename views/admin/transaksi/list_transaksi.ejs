@@ -1,76 +1,371 @@
 <%- include('../../partials/header.ejs') %>
-    <div class="container mt-4">
-        <h2>Daftar Transaksi Sewa</h2>
+    <% const rawRole=(user && (user.role || user.status)) || '' ; const
+        roleNorm=String(rawRole).toLowerCase().replace(/\s+/g,'').replace(/[_-]/g,''); const isAdmin=roleNorm==='admin'
+        ; %>
 
-        <form class="mb-3" method="get" action="/transaksi/list-transaksi">
-            <div class="input-group">
-                <input name="q" value="<%= filter_q || '' %>" class="form-control"
-                    placeholder="Cari id / username / status">
-                <button class="btn btn-primary">Cari</button>
-            </div>
-        </form>
-
-        <% if (success) { %>
-            <div class="alert alert-success">
-                <%= success %>
-            </div>
-            <% } %>
-                <% if (error) { %>
-                    <div class="alert alert-danger">
-                        <%= error %>
+        <div class="container" style="padding: 0px 10px 10px 10px; max-width: 1200px; margin: 0 auto;">
+            <div class="page-content">
+                <div class="section-header" style="margin-bottom: 30px;">
+                    <div>
+                        <h2 style="margin: 0; color: #1e293b; font-size: 2rem;">Daftar Transaksi</h2>
+                        <p style="margin: 5px 0 0 0; color: #64748b; font-size: 0.95rem;">Pantau status dan riwayat
+                            penyewaan</p>
                     </div>
-                    <% } %>
+                </div>
 
-                        <a href="/transaksi/create" class="btn btn-success mb-3">Tambah Transaksi</a>
+                <div class="search-section">
+                    <form action="/transaksi/list-transaksi" method="GET" class="search-form">
+                        <div class="search-input-wrapper">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" name="q" placeholder="Cari nama penyewa atau ID..."
+                                value="<%= typeof filter_q !== 'undefined' ? filter_q : '' %>" class="search-input">
+                        </div>
+                        <button type="submit" class="btn-search">Cari</button>
+                    </form>
+                </div>
 
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Username</th>
-                                    <th>Tgl Sewa</th>
-                                    <th>Tgl Kembali</th>
-                                    <th>Status</th>
-                                    <th>Total</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% records.forEach(r=> { %>
-                                    <tr>
-                                        <td>
-                                            <%= r.id_transaksi %>
-                                        </td>
-                                        <td>
-                                            <%= r.username %>
-                                        </td>
-                                        <td>
-                                            <%= r.tgl_sewa %>
-                                        </td>
-                                        <td>
-                                            <%= r.tgl_pengembalian || '-' %>
-                                        </td>
-                                        <td>
-                                            <%= r.status_transaksi %>
-                                        </td>
-                                        <td>
-                                            <%= (r.total_biaya_sewa || 0).toLocaleString('id-ID', { style: 'currency' ,
-                                                currency: 'IDR' , minimumFractionDigits: 0, maximumFractionDigits: 0 })
-                                                %>
-                                        </td>
-                                        <td>
-                                            <a class="btn btn-sm btn-info"
-                                                href="/transaksi/detail/<%= r.id_transaksi %>">Detail</a>
-                                            <a class="btn btn-sm btn-warning"
-                                                href="/transaksi/edit/<%= r.id_transaksi %>">Edit</a>
+                <div class="transaction-grid">
+                    <% if (records && records.length> 0) { %>
+                        <% records.forEach(function(r) { %>
+                            <div class="transaction-card">
+                                <% let statusClass='pending' ; const status=(r.status_transaksi || '' ).toLowerCase();
+                                    if(status==='selesai' ) statusClass='success' ; else if(status==='disewa' ||
+                                    status==='aktif' ) statusClass='warning' ; else if(status==='batal' )
+                                    statusClass='danger' ; %>
+                                    <div class="status-badge-top <%= statusClass %>">
+                                        <%= r.status_transaksi %>
+                                    </div>
+
+                                    <div class="card-content">
+                                        <div class="user-info">
+                                            <div class="avatar-circle">
+                                                <%= r.username ? r.username.charAt(0).toUpperCase() : 'U' %>
+                                            </div>
+                                            <div>
+                                                <span class="transaction-id">#<%= r.id_transaksi %></span>
+                                                <h4 class="username">
+                                                    <%= r.username %>
+                                                </h4>
+                                            </div>
+                                        </div>
+
+                                        <hr class="divider">
+
+                                        <div class="details">
+                                            <div class="detail-item">
+                                                <span class="label">📅 Tgl Sewa</span>
+                                                <span class="value">
+                                                    <%= r.tgl_sewa %>
+                                                </span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="label">⏰ Jatuh Tempo</span>
+                                                <span
+                                                    class="value <%= !r.tgl_pengembalian ? 'text-danger fw-bold' : '' %>">
+                                                    <%= r.tgl_pengembalian || 'Belum Kembali' %>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div class="price-section">
+                                            <span class="price-label">Total Biaya</span>
+                                            <h3 class="total-price">
+                                                <%= (r.total_biaya_sewa || 0).toLocaleString('id-ID', {
+                                                    style: 'currency' , currency: 'IDR' , minimumFractionDigits: 0 }) %>
+                                            </h3>
+                                        </div>
+
+                                        <div class="action-buttons">
+                                            <a href="/transaksi/detail/<%= r.id_transaksi %>"
+                                                class="btn-action btn-lihat" title="Detail">
+                                                <span>👁️</span>
+                                            </a>
+                                            <a href="/transaksi/edit/<%= r.id_transaksi %>" class="btn-action btn-edit"
+                                                title="Edit">
+                                                <span>✏️</span>
+                                            </a>
                                             <form action="/transaksi/delete/<%= r.id_transaksi %>" method="post"
-                                                style="display:inline" onsubmit="return confirm('Hapus?')">
-                                                <button class="btn btn-sm btn-danger">Hapus</button>
+                                                class="form-hapus" onsubmit="return confirm('Hapus transaksi ini?');">
+                                                <button type="submit" class="btn-action btn-hapus" title="Hapus">
+                                                    <span>🗑️</span>
+                                                </button>
                                             </form>
-                                        </td>
-                                    </tr>
-                                    <% }) %>
-                            </tbody>
-                        </table>
-    </div>
-    <%- include('../../partials/footer.ejs') %>
+                                        </div>
+                                    </div>
+                            </div>
+                            <% }); %>
+                                <% } else { %>
+                                    <div class="empty-state">
+                                        <div style="font-size: 3rem; margin-bottom: 15px;">📝</div>
+                                        <p>Data transaksi tidak ditemukan</p>
+                                    </div>
+                                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            .container {
+                padding-top: 10px !important;
+            }
+
+            /* Styling Dasar yang Mengikuti Daftar Barang */
+            .section-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-left: 4px solid #4f46e5;
+                padding-left: 15px;
+            }
+
+            .btn-tambah {
+                background: #4f46e5;
+                color: white;
+                text-decoration: none;
+                padding: 10px 25px;
+                border-radius: 10px;
+                font-weight: bold;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            /* Search Section */
+            .search-section {
+                margin-bottom: 30px;
+            }
+
+            .search-form {
+                display: flex;
+                gap: 10px;
+                max-width: 700px;
+                margin: 0 auto;
+            }
+
+            .search-input-wrapper {
+                position: relative;
+                flex-grow: 1;
+                display: flex;
+                align-items: center;
+            }
+
+            .search-icon {
+                position: absolute;
+                left: 15px;
+                color: #64748b;
+            }
+
+            .search-input {
+                width: 100%;
+                padding: 12px 12px 12px 45px;
+                border-radius: 10px;
+                border: 1px solid #cbd5e1;
+            }
+
+            .btn-search {
+                padding: 12px 30px;
+                border-radius: 10px;
+                border: none;
+                background: #1e293b;
+                color: white;
+                cursor: pointer;
+            }
+
+            /* Grid System */
+            .transaction-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 20px;
+            }
+
+            /* Card Styling */
+            .transaction-card {
+                background: white;
+                border-radius: 16px;
+                border: 1px solid #eee;
+                position: relative;
+                transition: 0.3s;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .transaction-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            }
+
+            .card-content {
+                padding: 20px;
+            }
+
+            /* Status Badge Overlay */
+            .status-badge-top {
+                position: absolute;
+                top: 0;
+                right: 0;
+                padding: 5px 15px;
+                font-size: 0.7rem;
+                font-weight: 800;
+                text-transform: uppercase;
+                border-bottom-left-radius: 12px;
+            }
+
+            .success {
+                background: #dcfce7;
+                color: #166534;
+            }
+
+            .warning {
+                background: #fffbeb;
+                color: #92400e;
+            }
+
+            .danger {
+                background: #fee2e2;
+                color: #991b1b;
+            }
+
+            .pending {
+                background: #f1f5f9;
+                color: #475569;
+            }
+
+            /* User Info Section */
+            .user-info {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 15px;
+            }
+
+            .avatar-circle {
+                width: 45px;
+                height: 45px;
+                background: #eef2ff;
+                color: #4f46e5;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 800;
+                font-size: 1.2rem;
+            }
+
+            .transaction-id {
+                font-size: 0.8rem;
+                color: #4f46e5;
+                font-weight: 700;
+            }
+
+            .username {
+                margin: 0;
+                font-size: 1rem;
+                color: #1e293b;
+            }
+
+            .divider {
+                border: 0;
+                border-top: 1px dashed #e2e8f0;
+                margin: 15px 0;
+            }
+
+            /* Detail Items */
+            .detail-item {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 8px;
+                font-size: 0.85rem;
+            }
+
+            .label {
+                color: #64748b;
+            }
+
+            .value {
+                color: #1e293b;
+                font-weight: 600;
+            }
+
+            /* Price Section */
+            .price-section {
+                background: #f8fafc;
+                padding: 12px;
+                border-radius: 12px;
+                margin: 15px 0;
+                text-align: center;
+            }
+
+            .price-label {
+                font-size: 0.75rem;
+                color: #64748b;
+                display: block;
+            }
+
+            .total-price {
+                margin: 0;
+                color: #16a34a;
+                font-size: 1.2rem;
+                font-weight: 800;
+            }
+
+            /* Action Buttons */
+            .action-buttons {
+                display: flex;
+                gap: 8px;
+            }
+
+            .btn-action {
+                flex: 1;
+                padding: 10px;
+                border-radius: 8px;
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .btn-lihat {
+                background: #e0f2fe;
+                color: #0369a1;
+            }
+
+            .btn-edit {
+                background: #fef3c7;
+                color: #b45309;
+            }
+
+            .btn-hapus {
+                background: #fee2e2;
+                color: #991b1b;
+                border: none;
+                width: 100%;
+            }
+
+            .form-hapus {
+                flex: 1;
+                display: flex;
+            }
+
+            .empty-state {
+                grid-column: 1/-1;
+                text-align: center;
+                padding: 60px;
+                background: #f9f9f9;
+                border-radius: 12px;
+                color: #64748b;
+            }
+
+            /* Responsive */
+            @media (max-width: 768px) {
+                .transaction-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .container {
+                    padding-top: 10px !important;
+                }
+            }
+        </style>
+
+        <%- include('../../partials/footer.ejs') %>

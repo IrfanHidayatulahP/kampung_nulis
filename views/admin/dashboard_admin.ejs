@@ -1,525 +1,435 @@
 <%- include('../partials/header.ejs') %>
 
-<!DOCTYPE html>
-<html lang="id">
+  <!DOCTYPE html>
+  <html lang="id">
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard - Portal Kampung Nulis</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f1f5f9;
-      min-height: 100vh;
-    }
-
-    /* Header */
-    .header {
-      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-      color: white;
-      padding: 20px 0;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .header-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .logo-section {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .logo-icon {
-      width: 50px;
-      height: 50px;
-      background: white;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .logo-icon svg {
-      width: 30px;
-      height: 30px;
-      fill: #1e3c72;
-    }
-
-    .logo-text h1 {
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
-
-    .logo-text p {
-      font-size: 12px;
-      opacity: 0.9;
-    }
-
-    .user-menu {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .user-info {
-      text-align: right;
-    }
-
-    .user-info .name {
-      font-weight: 600;
-      font-size: 14px;
-    }
-
-    .user-info .role {
-      font-size: 12px;
-      opacity: 0.9;
-    }
-
-    .logout-btn {
-      background: rgba(255, 255, 255, 0.2);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      display: inline-block;
-    }
-
-    .logout-btn:hover {
-      background: rgba(255, 255, 255, 0.3);
-    }
-
-    /* Container */
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 32px 20px;
-      margin-top: 32px;
-    }
-
-    /* Welcome Card */
-    .welcome-card {
-      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-      color: white;
-      padding: 32px;
-      border-radius: 16px;
-      margin-bottom: 32px;
-      box-shadow: 0 4px 12px rgba(30, 60, 114, 0.2);
-    }
-
-    .welcome-card h2 {
-      font-size: 28px;
-      margin-bottom: 8px;
-    }
-
-    .welcome-card p {
-      font-size: 15px;
-      opacity: 0.95;
-    }
-
-    .welcome-card .highlight {
-      background: rgba(255, 255, 255, 0.2);
-      padding: 2px 8px;
-      border-radius: 6px;
-      font-weight: 600;
-    }
-
-    /* Stats Grid */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 20px;
-      margin-bottom: 32px;
-    }
-
-    .stat-card {
-      background: white;
-      padding: 24px;
-      border-radius: 16px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-      transition: all 0.3s ease;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
-    }
-
-    .stat-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .stat-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .stat-icon.blue {
-      background: #e0f2fe;
-    }
-
-    .stat-icon.green {
-      background: #dcfce7;
-    }
-
-    .stat-icon.purple {
-      background: #f3e8ff;
-    }
-
-    .stat-icon.orange {
-      background: #ffedd5;
-    }
-
-    .stat-icon svg {
-      width: 24px;
-      height: 24px;
-    }
-
-    .stat-icon.blue svg {
-      fill: #0284c7;
-    }
-
-    .stat-icon.green svg {
-      fill: #16a34a;
-    }
-
-    .stat-icon.purple svg {
-      fill: #9333ea;
-    }
-
-    .stat-icon.orange svg {
-      fill: #ea580c;
-    }
-
-    .stat-content h3 {
-      font-size: 16px;
-      color: #64748b;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .stat-content p {
-      font-size: 13px;
-      color: #94a3b8;
-    }
-
-    .stat-link {
-      display: inline-block;
-      margin-top: 12px;
-      padding: 8px 16px;
-      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      transition: all 0.3s ease;
-    }
-
-    .stat-link:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(30, 60, 114, 0.3);
-    }
-
-    /* Profile Card */
-    .profile-card {
-      background: white;
-      padding: 32px;
-      border-radius: 16px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    }
-
-    .profile-card h3 {
-      font-size: 20px;
-      color: #1e3c72;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .profile-card h3::before {
-      content: '';
-      width: 4px;
-      height: 24px;
-      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-      border-radius: 2px;
-    }
-
-    .profile-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-    }
-
-    .profile-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      padding: 16px;
-      background: #f8fafc;
-      border-radius: 12px;
-      border-left: 3px solid #2a5298;
-    }
-
-    .profile-item-icon {
-      width: 40px;
-      height: 40px;
-      background: #e0f2fe;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .profile-item-icon svg {
-      width: 20px;
-      height: 20px;
-      fill: #0284c7;
-    }
-
-    .profile-item-content {
-      flex: 1;
-    }
-
-    .profile-item-label {
-      font-size: 12px;
-      color: #64748b;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 4px;
-    }
-
-    .profile-item-value {
-      font-size: 15px;
-      color: #1e293b;
-      font-weight: 500;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .header-content {
-        flex-direction: column;
-        gap: 16px;
-        text-align: center;
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Portal Kampung Nulis</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
       }
 
-      .logo-section {
-        flex-direction: column;
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f1f5f9;
+        min-height: 100vh;
       }
 
-      .user-info {
-        text-align: center;
+      /* Container */
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 32px 20px;
+        margin-top: 32px;
       }
 
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .profile-grid {
-        grid-template-columns: 1fr;
-      }
-
+      /* Welcome Card */
       .welcome-card {
-        padding: 24px;
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        color: white;
+        padding: 32px;
+        border-radius: 16px;
+        margin-bottom: 32px;
+        box-shadow: 0 4px 12px rgba(30, 60, 114, 0.2);
       }
 
       .welcome-card h2 {
-        font-size: 24px;
+        font-size: 28px;
+        margin-bottom: 8px;
       }
-    }
-  </style>
-</head>
 
-<body>
-  <!-- Main Content -->
-  <div class="container">
-    <!-- Welcome Card -->
-    <div class="welcome-card">
-      <h2>Dashboard Administrator</h2>
-      <p>Selamat datang kembali, <span class="highlight">Admin Kampung Nulis</span>. Kelola sistem informasi desa dengan
-        mudah dan efisien.</p>
+      .welcome-card p {
+        font-size: 15px;
+        opacity: 0.95;
+      }
+
+      .welcome-card .highlight {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-weight: 600;
+      }
+
+      /* Stats Grid */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+        margin-bottom: 32px;
+      }
+
+      .stat-card {
+        background: white;
+        padding: 24px;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+      }
+
+      .stat-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .stat-icon.blue {
+        background: #e0f2fe;
+      }
+
+      .stat-icon.green {
+        background: #dcfce7;
+      }
+
+      .stat-icon.orange {
+        background: #ffedd5;
+      }
+
+      .stat-icon.purple {
+        background: #f3e8ff;
+      }
+
+      .stat-icon svg {
+        width: 24px;
+        height: 24px;
+      }
+
+      .stat-icon.blue svg {
+        fill: #0284c7;
+      }
+
+      .stat-icon.green svg {
+        fill: #16a34a;
+      }
+
+      .stat-icon.orange svg {
+        fill: #ea580c;
+      }
+
+      .stat-icon.purple svg {
+        fill: #9333ea;
+      }
+
+      .stat-content h3 {
+        font-size: 20px;
+        color: #1e293b;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+
+      .stat-content p {
+        font-size: 13px;
+        color: #64748b;
+        font-weight: 500;
+      }
+
+      .stat-link {
+        display: inline-block;
+        margin-top: 12px;
+        padding: 8px 16px;
+        background: #f8fafc;
+        color: #1e3c72;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 1px solid #e2e8f0;
+      }
+
+      .stat-link:hover {
+        background: #1e3c72;
+        color: white;
+      }
+
+      /* Profile Card */
+      .profile-card {
+        background: white;
+        padding: 32px;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+
+      .profile-card h3 {
+        font-size: 20px;
+        color: #1e3c72;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .profile-card h3::before {
+        content: '';
+        width: 4px;
+        height: 24px;
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        border-radius: 2px;
+      }
+
+      .profile-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+      }
+
+      .profile-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px;
+        background: #f8fafc;
+        border-radius: 12px;
+        border-left: 3px solid #2a5298;
+      }
+
+      .profile-item-icon {
+        width: 40px;
+        height: 40px;
+        background: #e0f2fe;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .profile-item-icon svg {
+        width: 20px;
+        height: 20px;
+        fill: #0284c7;
+      }
+
+      .profile-item-content {
+        flex: 1;
+      }
+
+      .profile-item-label {
+        font-size: 11px;
+        color: #64748b;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+      }
+
+      .profile-item-value {
+        font-size: 14px;
+        color: #1e293b;
+        font-weight: 600;
+      }
+
+      @media (max-width: 768px) {
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .profile-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="welcome-card">
+        <h2>Dashboard Administrator</h2>
+        <p>Selamat datang kembali, <span class="highlight">
+            <%= user ? user.username : 'Admin' %>
+          </span>. Kelola sistem informasi desa dengan mudah dan efisien.</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <h3>
+                <%= typeof jumlahPeminjam !=='undefined' ? jumlahPeminjam : 0 %>
+              </h3>
+              <p>Total Peminjam</p>
+            </div>
+          </div>
+          <a href="/peminjam/list-peminjam" class="stat-link">Lihat Semua →</a>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <h3>
+                <%= typeof jumlahTransaksi !=='undefined' ? jumlahTransaksi : 0 %>
+              </h3>
+              <p>Total Transaksi</p>
+            </div>
+          </div>
+          <a href="/transaksi/list-transaksi" class="stat-link">Lihat Riwayat →</a>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon orange">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path
+                  d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                </path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <h3>
+                <%= typeof jumlahBarangReady !=='undefined' ? jumlahBarangReady : 0 %>
+              </h3>
+              <p>Barang Ready Stok</p>
+            </div>
+          </div>
+          <a href="/barang/list-barang" class="stat-link">Cek Stok →</a>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon purple">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <h3>Info</h3>
+              <p>Pusat Pengumuman</p>
+            </div>
+          </div>
+          <a href="/admin/announcements" class="stat-link">Kelola Info →</a>
+        </div>
+      </div>
+
+      <div class="profile-card">
+        <h3>Detail Akun Administrator</h3>
+        <div class="profile-grid">
+          <div class="profile-item">
+            <div class="profile-item-icon">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+              </svg>
+            </div>
+            <div class="profile-item-content">
+              <div class="profile-item-label">Username</div>
+              <div class="profile-item-value">
+                <%= user && user.username ? user.username : '-' %>
+              </div>
+            </div>
+          </div>
+
+          <div class="profile-item">
+            <div class="profile-item-icon">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
+              </svg>
+            </div>
+            <div class="profile-item-content">
+              <div class="profile-item-label">Nama Lengkap</div>
+              <div class="profile-item-value">
+                <%= user && user.nama_lengkap ? user.nama_lengkap : '-' %>
+              </div>
+            </div>
+          </div>
+
+          <div class="profile-item">
+            <div class="profile-item-icon">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+              </svg>
+            </div>
+            <div class="profile-item-content">
+              <div class="profile-item-label">Alamat</div>
+              <div class="profile-item-value">
+                <%= user && user.alamat ? user.alamat : '-' %>
+              </div>
+            </div>
+          </div>
+
+          <div class="profile-item">
+            <div class="profile-item-icon">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
+              </svg>
+            </div>
+            <div class="profile-item-content">
+              <div class="profile-item-label">No. Telepon</div>
+              <div class="profile-item-value">
+                <%= user && user.no_telpon ? user.no_telpon : '-' %>
+              </div>
+            </div>
+          </div>
+
+          <div class="profile-item">
+            <div class="profile-item-icon">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z" />
+              </svg>
+            </div>
+            <div class="profile-item-content">
+              <div class="profile-item-label">Status Anggota</div>
+              <div class="profile-item-value">
+                <%= user && user.status ? user.status : '-' %>
+              </div>
+            </div>
+          </div>
+
+          <div class="profile-item">
+            <div class="profile-item-icon">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+              </svg>
+            </div>
+            <div class="profile-item-content">
+              <div class="profile-item-label">Akses Sistem</div>
+              <div class="profile-item-value">Administrator</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </body>
 
-    <!-- Stats Grid -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-header">
-          <div class="stat-icon blue">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-            </svg>
-          </div>
-          <div class="stat-content">
-            <h3>Manajemen Pengguna</h3>
-            <p>Kelola akun warga</p>
-          </div>
-        </div>
-        <a href="/admin/users" class="stat-link">Kelola Pengguna →</a>
-      </div>
+  </html>
 
-      <div class="stat-card">
-        <div class="stat-header">
-          <div class="stat-icon green">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
-            </svg>
-          </div>
-          <div class="stat-content">
-            <h3>Statistik</h3>
-            <p>Data dan laporan</p>
-          </div>
-        </div>
-        <a href="/admin/stats" class="stat-link">Lihat Statistik →</a>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-header">
-          <div class="stat-icon purple">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94L14.4 2.81c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" />
-            </svg>
-          </div>
-          <div class="stat-content">
-            <h3>Pengaturan</h3>
-            <p>Konfigurasi sistem</p>
-          </div>
-        </div>
-        <a href="/admin/settings" class="stat-link">Pengaturan →</a>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-header">
-          <div class="stat-icon orange">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z" />
-            </svg>
-          </div>
-          <div class="stat-content">
-            <h3>Pengumuman</h3>
-            <p>Kelola informasi desa</p>
-          </div>
-        </div>
-        <a href="/admin/announcements" class="stat-link">Kelola Pengumuman →</a>
-      </div>
-    </div>
-
-    <!-- Profile Card -->
-    <div class="profile-card">
-      <h3>Detail Akun Administrator</h3>
-      <div class="profile-grid">
-        <div class="profile-item">
-          <div class="profile-item-icon">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-            </svg>
-          </div>
-          <div class="profile-item-content">
-            <div class="profile-item-label">Username</div>
-            <div class="profile-item-value">admin_kampung</div>
-          </div>
-        </div>
-
-        <div class="profile-item">
-          <div class="profile-item-icon">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
-            </svg>
-          </div>
-          <div class="profile-item-content">
-            <div class="profile-item-label">Nama Lengkap</div>
-            <div class="profile-item-value">Administrator Kampung Nulis</div>
-          </div>
-        </div>
-
-        <div class="profile-item">
-          <div class="profile-item-icon">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-            </svg>
-          </div>
-          <div class="profile-item-content">
-            <div class="profile-item-label">Alamat</div>
-            <div class="profile-item-value">Kantor Desa Kampung Nulis</div>
-          </div>
-        </div>
-
-        <div class="profile-item">
-          <div class="profile-item-icon">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
-            </svg>
-          </div>
-          <div class="profile-item-content">
-            <div class="profile-item-label">No. Telepon</div>
-            <div class="profile-item-value">0812-3456-7890</div>
-          </div>
-        </div>
-
-        <div class="profile-item">
-          <div class="profile-item-icon">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z" />
-            </svg>
-          </div>
-          <div class="profile-item-content">
-            <div class="profile-item-label">Status</div>
-            <div class="profile-item-value">Administrator Aktif</div>
-          </div>
-        </div>
-
-        <div class="profile-item">
-          <div class="profile-item-icon">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
-            </svg>
-          </div>
-          <div class="profile-item-content">
-            <div class="profile-item-label">Role</div>
-            <div class="profile-item-value">Super Administrator</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</body>
-
-</html>
+  <%- include('../partials/footer.ejs') %>

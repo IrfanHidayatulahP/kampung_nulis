@@ -1,65 +1,393 @@
 <%- include('../../partials/header.ejs') %>
+
     <% const rawRole=(typeof user !=='undefined' && (user.role || user.status)) || '' ; const
         roleNorm=String(rawRole).toLowerCase().replace(/\s+/g,'').replace(/[_-]/g,''); const isAdmin=roleNorm==='admin'
         ; %>
 
-        <div class="container mt-4">
-            <h2>Detail Barang</h2>
+        <div class="main-content-wrapper">
+            <div class="container">
+                <div class="mb-4 d-flex justify-content-between align-items-center">
+                    <a href="/barang/list-barang" class="btn-back-modern">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z" />
+                        </svg>
+                        Kembali ke Daftar
+                    </a>
+                    <span class="text-muted small fw-medium d-none d-sm-block">Detail Inventaris / <%=
+                            barang.nama_barang %></span>
+                </div>
 
-            <div class="card mb-4">
-                <div class="row g-0">
-                    <div class="col-md-4">
-                        <% if (barang.photo_path) { %>
-                            <img src="<%= barang.photo_path %>" class="img-fluid rounded-start"
-                                alt="Foto <%= barang.nama_barang %>">
-                            <% } else { %>
-                                <div class="d-flex align-items-center justify-content-center"
-                                    style="height:220px; background:#f5f5f5;">
-                                    <span class="text-muted">No image</span>
+                <div class="detail-card">
+                    <div class="row g-0">
+                        <div class="col-lg-5">
+                            <div class="detail-image-container">
+                                <% if (barang.photo_path) { %>
+                                    <img src="<%= barang.photo_path %>" alt="<%= barang.nama_barang %>"
+                                        class="main-image">
+                                    <% } else { %>
+                                        <div class="no-image-placeholder">
+                                            <span>🖼️</span>
+                                            <p>Tidak ada foto barang</p>
+                                        </div>
+                                        <% } %>
+
+                                            <div
+                                                class="status-badge <%= barang.stok_tersedia > 0 ? 'available' : 'unavailable' %>">
+                                                <%= barang.stok_tersedia> 0 ? 'Tersedia' : 'Habis' %>
+                                            </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-7">
+                            <div class="detail-content">
+                                <div class="content-header">
+                                    <span class="item-id">ID Barang: #<%= barang.id_barang %></span>
+                                    <h1 class="item-title">
+                                        <%= barang.nama_barang %>
+                                    </h1>
+                                    <div class="price-tag">
+                                        <span class="label">Harga Sewa:</span>
+                                        <span class="amount">Rp <%= (barang.harga_dasar_sewa ||
+                                                0).toLocaleString('id-ID') %></span>
+                                        <span class="period">/ hari</span>
+                                    </div>
                                 </div>
-                                <% } %>
-                    </div>
-                    <div class="col-md-8">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <%= barang.nama_barang %> <small class="text-muted">(ID: <%= barang.id_barang %>
-                                            )</small>
-                            </h5>
 
-                            <dl class="row">
-                                <dt class="col-sm-4">Jumlah Total</dt>
-                                <dd class="col-sm-8">
-                                    <%= barang.jumlah_total %>
-                                </dd>
+                                <div class="specs-grid">
+                                    <div class="spec-item">
+                                        <span class="spec-icon">📦</span>
+                                        <div class="spec-info">
+                                            <label>Total Stok</label>
+                                            <p>
+                                                <%= barang.jumlah_total %>
+                                                    <%= barang.satuan_jumlah || 'unit' %>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-icon">✅</span>
+                                        <div class="spec-info">
+                                            <label>Stok Ready</label>
+                                            <p>
+                                                <%= barang.stok_tersedia %>
+                                                    <%= barang.satuan_jumlah || 'unit' %>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-icon">📏</span>
+                                        <div class="spec-info">
+                                            <label>Satuan</label>
+                                            <p>
+                                                <%= barang.satuan_jumlah || '-' %>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
 
-                                <dt class="col-sm-4">Stok Tersedia</dt>
-                                <dd class="col-sm-8">
-                                    <%= barang.stok_tersedia %>
-                                </dd>
+                                <hr class="my-4" style="opacity: 0.1;">
 
-                                <dt class="col-sm-4">Satuan</dt>
-                                <dd class="col-sm-8">
-                                    <%= barang.satuan_jumlah || '-' %>
-                                </dd>
-
-                                <dt class="col-sm-4">Harga Dasar Sewa</dt>
-                                <dd class="col-sm-8">Rp <%= (barang.harga_dasar_sewa || 0).toLocaleString() %>
-                                </dd>
-                            </dl>
-
-                            <% if (isAdmin) { %>
-                                <a href="/barang/edit/<%= barang.id_barang %>" class="btn btn-warning">Edit</a>
-                                <form action="/barang/delete/<%= barang.id_barang %>" method="post"
-                                    style="display:inline" onsubmit="return confirm('Hapus barang ini?');">
-                                    <button class="btn btn-danger">Hapus</button>
-                                </form>
-                                <% } %>
-
-                                    <a href="/barang/list-barang" class="btn btn-secondary">Kembali</a>
+                                <div class="detail-actions">
+                                    <% if (isAdmin) { %>
+                                        <a href="/barang/edit/<%= barang.id_barang %>" class="btn-edit-main">
+                                            <span>✏️</span> Edit Data
+                                        </a>
+                                        <form action="/barang/delete/<%= barang.id_barang %>" method="post"
+                                            class="d-inline flex-grow-1"
+                                            onsubmit="return confirm('Apakah Anda yakin ingin menghapus barang ini?');">
+                                            <button type="submit" class="btn-delete-main w-100">
+                                                <span>🗑️</span> Hapus
+                                            </button>
+                                        </form>
+                                        <% } else { %>
+                                            <button class="btn-rent-info">
+                                                <span>📞</span> Hubungi Admin untuk Sewa
+                                            </button>
+                                            <% } %>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <style>
+            .main-content-wrapper {
+                padding: 50px 15px 50px 15px;
+                background-color: #f8fafc;
+                min-height: 100vh;
+            }
+
+            /* Tombol Kembali Modern */
+            .btn-back-modern {
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+                padding: 10px 18px;
+                background-color: #ffffff;
+                color: #475569;
+                border: 1px solid #e2e8f0;
+                border-radius: 12px;
+                font-size: 0.95rem;
+                font-weight: 600;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            }
+
+            .btn-back-modern svg {
+                transition: transform 0.3s ease;
+            }
+
+            .btn-back-modern:hover {
+                background-color: #f8fafc;
+                color: #1e293b;
+                border-color: #cbd5e1;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+                transform: translateY(-1px);
+            }
+
+            .btn-back-modern:hover svg {
+                transform: translateX(-5px);
+            }
+
+            /* Main Card */
+            .detail-card {
+                background: white;
+                border-radius: 20px;
+                overflow: hidden;
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+                border: 1px solid #e2e8f0;
+            }
+
+            /* Image Styling Perbaikan Ukuran */
+            .detail-image-container {
+                position: relative;
+                height: 100%;
+                min-height: 350px;
+                background: #f1f5f9;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+            }
+
+            .main-image {
+                width: 100%;
+                height: 100%;
+                max-height: 450px;
+                object-fit: contain;
+                /* Gambar utuh, tidak terpotong */
+                padding: 30px;
+                /* Memberi jarak agar tidak menempel ke border */
+            }
+
+            .no-image-placeholder {
+                text-align: center;
+                color: #94a3b8;
+            }
+
+            .no-image-placeholder span {
+                font-size: 4rem;
+                display: block;
+            }
+
+            .status-badge {
+                position: absolute;
+                top: 20px;
+                left: 20px;
+                padding: 6px 16px;
+                border-radius: 50px;
+                font-size: 0.75rem;
+                font-weight: 700;
+                color: white;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .status-badge.available {
+                background: #22c55e;
+            }
+
+            .status-badge.unavailable {
+                background: #ef4444;
+            }
+
+            /* Content Styling */
+            .detail-content {
+                padding: 40px;
+            }
+
+            .item-id {
+                display: inline-block;
+                padding: 4px 12px;
+                background: #eff6ff;
+                color: #3b82f6;
+                border-radius: 6px;
+                font-size: 0.8rem;
+                font-weight: 600;
+                margin-bottom: 15px;
+            }
+
+            .item-title {
+                font-size: 2rem;
+                font-weight: 800;
+                color: #1e293b;
+                margin-bottom: 20px;
+                line-height: 1.2;
+            }
+
+            /* Price Tag */
+            .price-tag {
+                background: #f8fafc;
+                padding: 20px;
+                border-radius: 12px;
+                margin-bottom: 30px;
+                border-left: 4px solid #059669;
+            }
+
+            .price-tag .label {
+                display: block;
+                font-size: 0.85rem;
+                color: #64748b;
+                margin-bottom: 4px;
+            }
+
+            .price-tag .amount {
+                font-size: 1.7rem;
+                font-weight: 800;
+                color: #059669;
+            }
+
+            .price-tag .period {
+                color: #64748b;
+                font-size: 0.9rem;
+            }
+
+            /* Specs Grid */
+            .specs-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 20px;
+            }
+
+            .spec-item {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+
+            .spec-icon {
+                width: 42px;
+                height: 42px;
+                background: #f1f5f9;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 10px;
+                font-size: 1.1rem;
+            }
+
+            .spec-info label {
+                display: block;
+                font-size: 0.75rem;
+                color: #94a3b8;
+                margin: 0;
+            }
+
+            .spec-info p {
+                margin: 0;
+                font-weight: 700;
+                color: #1e293b;
+                font-size: 0.95rem;
+            }
+
+            /* Action Buttons */
+            .detail-actions {
+                display: flex;
+                gap: 12px;
+                margin-top: 30px;
+            }
+
+            .btn-edit-main {
+                background: #1e293b;
+                color: white !important;
+                text-decoration: none;
+                padding: 14px 28px;
+                border-radius: 12px;
+                font-weight: 600;
+                flex: 2;
+                text-align: center;
+                transition: 0.3s;
+            }
+
+            .btn-edit-main:hover {
+                background: #0f172a;
+                transform: translateY(-2px);
+            }
+
+            .btn-delete-main {
+                background: #fee2e2;
+                color: #991b1b;
+                border: none;
+                padding: 14px 20px;
+                border-radius: 12px;
+                font-weight: 600;
+                transition: 0.3s;
+            }
+
+            .btn-delete-main:hover {
+                background: #fecaca;
+                transform: translateY(-2px);
+            }
+
+            .btn-rent-info {
+                background: #2563eb;
+                color: white;
+                border: none;
+                padding: 15px;
+                border-radius: 12px;
+                width: 100%;
+                font-weight: 700;
+            }
+
+            /* Responsive */
+            @media (max-width: 991px) {
+                .detail-image-container {
+                    min-height: 300px;
+                }
+
+                .detail-content {
+                    padding: 30px;
+                }
+
+                .main-content-wrapper {
+                    padding: 80px 15px 50px 15px;
+                }
+            }
+
+            @media (max-width: 576px) {
+                .detail-actions {
+                    flex-direction: column;
+                }
+
+                .btn-edit-main,
+                .btn-delete-main {
+                    width: 100%;
+                }
+
+                .specs-grid {
+                    grid-template-columns: 1fr 1fr;
+                }
+
+                .item-title {
+                    font-size: 1.6rem;
+                }
+            }
+        </style>
 
         <%- include('../../partials/footer.ejs') %>

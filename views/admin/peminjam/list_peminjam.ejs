@@ -1,101 +1,381 @@
 <%- include('../../partials/header.ejs', { title: 'Daftar Peminjam' , currentPath: '/peminjam/list-peminjam' , user:
     user }) %>
 
-    <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-            <h2>Daftar Peminjam</h2>
-            <div>
-                <a href="/peminjam/create" class="btn">Tambah Peminjam</a>
+    <div class="main-content-wrapper">
+        <div class="container">
+            <div class="page-header-section">
+                <div class="row align-items-center">
+                    <div class="col-md-7 mb-3 mb-md-0">
+                        <h2 class="page-title">Daftar Peminjam</h2>
+                        <p class="page-subtitle">Kelola informasi dan status keanggotaan peminjam</p>
+                    </div>
+                    <div class="col-md-5 text-md-end">
+                        <a href="/peminjam/create" class="btn btn-primary-custom">
+                            <i class="bi bi-person-plus-fill me-2"></i> Tambah Peminjam
+                        </a>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <form method="GET" action="/peminjam/list-peminjam" style="margin-top:12px;display:flex;gap:8px;">
-            <input type="text" name="q" placeholder="Cari username / nama / no. telepon"
-                value="<%= typeof filter_q !== 'undefined' ? filter_q : '' %>"
-                style="flex:1;padding:8px;border-radius:8px;border:1px solid #ddd;">
-            <button class="btn-ghost" type="submit">Cari</button>
-        </form>
+            <div class="search-card">
+                <form method="GET" action="/peminjam/list-peminjam">
+                    <div class="search-wrapper">
+                        <div class="input-group-custom">
+                            <i class="bi bi-search search-icon"></i>
+                            <input type="text" name="q" class="form-control-custom" placeholder="Cari username, nama..."
+                                value="<%= typeof filter_q !== 'undefined' ? filter_q : '' %>">
+                        </div>
+                        <button class="btn-search-custom" type="submit">Cari</button>
+                    </div>
+                </form>
+            </div>
 
-        <div id="flash-wrapper" style="margin-top:12px;"></div>
+            <div id="flash-wrapper"></div>
 
-        <div style="overflow:auto;margin-top:12px;">
-            <table style="width:100%;border-collapse:collapse;">
-                <thead style="text-align:left">
-                    <tr>
-                        <th style="padding:10px;border-bottom:1px solid #eee">Username</th>
-                        <th style="padding:10px;border-bottom:1px solid #eee">Nama Lengkap</th>
-                        <th style="padding:10px;border-bottom:1px solid #eee">No. Telepon</th>
-                        <th style="padding:10px;border-bottom:1px solid #eee">Status</th>
-                        <th style="padding:10px;border-bottom:1px solid #eee">Tanggal Daftar</th>
-                        <th style="padding:10px;border-bottom:1px solid #eee;width:220px">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% if (!records || records.length===0) { %>
-                        <tr>
-                            <td colspan="6" style="padding:14px;text-align:center;color:var(--muted)">Belum ada data
-                                peminjam.</td>
-                        </tr>
-                        <% } else { %>
-                            <% records.forEach(function(item){ %>
-                                <tr>
-                                    <td style="padding:10px;border-bottom:1px solid #f4f4f4">
-                                        <%= item.username %>
-                                    </td>
-                                    <td style="padding:10px;border-bottom:1px solid #f4f4f4">
-                                        <%= item.nama_lengkap || '-' %>
-                                    </td>
-                                    <td style="padding:10px;border-bottom:1px solid #f4f4f4">
-                                        <%= item.no_telpon || '-' %>
-                                    </td>
-                                    <td style="padding:10px;border-bottom:1px solid #f4f4f4">
-                                        <%= item.status || '-' %>
-                                    </td>
-                                    <td style="padding:10px;border-bottom:1px solid #f4f4f4">
-                                        <%= item.tgl_daftar || '-' %>
-                                    </td>
-                                    <td style="padding:10px;border-bottom:1px solid #f4f4f4">
+            <div class="row g-4">
+                <% if (!records || records.length===0) { %>
+                    <div class="col-12 text-center py-5">
+                        <div class="empty-state">
+                            <i class="bi bi-people text-muted" style="font-size: 4rem;"></i>
+                            <h4 class="mt-3 text-muted">Belum ada data peminjam</h4>
+                            <p>Silahkan tambah peminjam baru untuk memulai.</p>
+                        </div>
+                    </div>
+                    <% } else { %>
+                        <% records.forEach(function(item){ %>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="peminjam-card shadow-sm h-100">
+                                    <div
+                                        class="card-status-badge <%= item.status === 'aktif' ? 'bg-success' : 'bg-secondary' %>">
+                                        <%= (item.status || 'OFFLINE' ).toUpperCase() %>
+                                    </div>
 
-                                        <button type="button" class="btn"
-                                            onclick="window.location.href='/peminjam/detail/<%= encodeURIComponent(item.username) %>'"
-                                            style="background: #2196F3; color: white; margin-right: 6px; padding:8px 10px; border-radius:8px; border:none;">Detail</button>
+                                    <div class="card-body-custom">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="avatar-circle">
+                                                <%= item.nama_lengkap ? item.nama_lengkap.charAt(0).toUpperCase() : 'U'
+                                                    %>
+                                            </div>
+                                            <div>
+                                                <h5 class="peminjam-name">
+                                                    <%= item.nama_lengkap || 'Tanpa Nama' %>
+                                                </h5>
+                                                <p class="peminjam-username text-muted">@<%= item.username %>
+                                                </p>
+                                            </div>
+                                        </div>
 
-                                        <button type="button" class="btn"
-                                            onclick="window.location.href='/peminjam/edit/<%= encodeURIComponent(item.username) %>'"
-                                            style="background: #4CAF50; color: white; margin-right: 6px; padding:8px 10px; border-radius:8px; border:none;">Edit</button>
+                                        <div class="info-list">
+                                            <div class="info-item">
+                                                <i class="bi bi-telephone"></i>
+                                                <span>
+                                                    <%= item.no_telpon || '-' %>
+                                                </span>
+                                            </div>
+                                            <div class="info-item">
+                                                <i class="bi bi-calendar3"></i>
+                                                <span>Terdaftar: <%= item.tgl_daftar || '-' %></span>
+                                            </div>
+                                        </div>
 
-                                        <form method="POST"
-                                            action="/peminjam/delete/<%= encodeURIComponent(item.username) %>"
-                                            style="display:inline-block"
-                                            onsubmit="return confirmDelete('<%= item.username %>')">
-                                            <button type="submit" class="btn"
-                                                style="background:var(--danger);color:white;padding:8px 10px;border-radius:8px;border:none;">Hapus</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                <% }) %>
-                                    <% } %>
-                </tbody>
-            </table>
+                                        <div class="card-actions">
+                                            <a href="/peminjam/detail/<%= encodeURIComponent(item.username) %>"
+                                                class="btn btn-action btn-view" title="Detail">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="/peminjam/edit/<%= encodeURIComponent(item.username) %>"
+                                                class="btn btn-action btn-edit" title="Edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <form method="POST"
+                                                action="/peminjam/delete/<%= encodeURIComponent(item.username) %>"
+                                                onsubmit="return confirmDelete('<%= item.username %>')"
+                                                class="d-inline flex-grow-0">
+                                                <button type="submit" class="btn btn-action btn-delete" title="Hapus">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <% }) %>
+                                <% } %>
+            </div>
         </div>
     </div>
 
+    <style>
+        /* Layout Utama */
+        .main-content-wrapper {
+            padding: 50px 0;
+            background-color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        /* Header Section Spacing */
+        .page-header-section {
+            margin-bottom: 35px;
+        }
+
+        .page-title {
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        /* Custom Buttons Header */
+        .btn-primary-custom {
+            background-color: #4f46e5;
+            color: white;
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: 0.3s;
+            border: none;
+        }
+
+        .btn-primary-custom:hover {
+            background-color: #4338ca;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Search Bar - Fixed for Mobile (Horizontal) */
+        .search-card {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 40px;
+            /* Jarak ke konten bawah */
+        }
+
+        .search-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .input-group-custom {
+            display: flex;
+            align-items: center;
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 0 15px;
+            flex-grow: 1;
+            /* Input melebar maksimal */
+        }
+
+        .search-icon {
+            color: #94a3b8;
+            margin-right: 12px;
+        }
+
+        .form-control-custom {
+            border: none;
+            background: transparent;
+            padding: 12px 0;
+            width: 100%;
+            outline: none;
+            font-size: 0.95rem;
+        }
+
+        .btn-search-custom {
+            background: #1e293b;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 25px;
+            font-weight: 600;
+            white-space: nowrap;
+            /* Teks "Cari" tidak turun ke bawah */
+            transition: 0.2s;
+        }
+
+        .btn-search-custom:hover {
+            background: #0f172a;
+        }
+
+        /* Peminjam Card & Spacing */
+        .peminjam-card {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid #f1f5f9;
+            position: relative;
+            transition: 0.3s;
+            overflow: hidden;
+        }
+
+        .peminjam-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08) !important;
+        }
+
+        .card-body-custom {
+            padding: 30px;
+        }
+
+        /* Jarak isi card ke tepi */
+
+        .avatar-circle {
+            width: 55px;
+            height: 55px;
+            background: #e0e7ff;
+            color: #4f46e5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            font-weight: 800;
+            font-size: 1.2rem;
+            margin-right: 20px;
+            /* Jarak avatar ke teks nama */
+        }
+
+        .peminjam-name {
+            margin-bottom: 4px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .peminjam-username {
+            font-size: 0.85rem;
+            margin-bottom: 0;
+        }
+
+        /* Info List Spacing */
+        .info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            /* Jarak antar item (telepon & tgl) */
+            margin-top: 25px;
+            margin-bottom: 30px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #475569;
+            font-size: 0.95rem;
+        }
+
+        .info-item i {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        /* Action Buttons Spacing */
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 20px;
+        }
+
+        .btn-action {
+            flex: 1;
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            border: none;
+        }
+
+        .btn-view {
+            background: #f0f9ff;
+            color: #0369a1;
+        }
+
+        .btn-view:hover {
+            background: #0369a1;
+            color: white;
+        }
+
+        .btn-edit {
+            background: #f0fdf4;
+            color: #15803d;
+        }
+
+        .btn-edit:hover {
+            background: #15803d;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #fef2f2;
+            color: #b91c1c;
+            flex: 0 0 50px;
+        }
+
+        /* Tombol hapus lebih kecil */
+        .btn-delete:hover {
+            background: #b91c1c;
+            color: white;
+        }
+
+        /* Badges */
+        .card-status-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 800;
+            z-index: 10;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 576px) {
+            .container {
+                padding: 25px 15px;
+            }
+
+            .search-wrapper {
+                gap: 8px;
+            }
+
+            .btn-search-custom {
+                padding: 12px 15px;
+                font-size: 0.9rem;
+            }
+
+            .card-body-custom {
+                padding: 20px;
+            }
+        }
+    </style>
+
     <script>
-        // Handle delete confirmation
         function confirmDelete(username) {
             return confirm('Yakin ingin menghapus peminjam "' + username + '"? Tindakan ini tidak bisa dibatalkan.');
         }
 
-        // Show flash from querystring (redirected actions set ?success=... or ?error=...)
         (function showFlashFromQS() {
             const params = new URLSearchParams(window.location.search);
             const success = params.get('success');
             const error = params.get('error');
             const wrapper = document.getElementById('flash-wrapper');
             if (success) {
-                wrapper.innerHTML = '<div class="card" style="background:var(--success);color:white;padding:10px;border-radius:8px;">' + decodeURIComponent(success) + '</div>';
+                wrapper.innerHTML = `<div class="alert alert-success border-0 shadow-sm mb-4" style="border-radius:15px; padding: 15px;">
+                <i class="bi bi-check-circle-fill me-2"></i> ${decodeURIComponent(success)}
+            </div>`;
             } else if (error) {
-                wrapper.innerHTML = '<div class="card" style="background:var(--danger);color:white;padding:10px;border-radius:8px;">' + decodeURIComponent(error) + '</div>';
+                wrapper.innerHTML = `<div class="alert alert-danger border-0 shadow-sm mb-4" style="border-radius:15px; padding: 15px;">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> ${decodeURIComponent(error)}
+            </div>`;
             }
         })();
     </script>

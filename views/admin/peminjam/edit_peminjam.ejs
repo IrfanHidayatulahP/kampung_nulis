@@ -1,60 +1,309 @@
-<%- include('../../partials/header.ejs', { title: 'Edit Peminjam' , currentPath: '/peminjam/edit' , user: user }) %>
+<%- include('../../partials/header.ejs', { title: 'Edit Peminjam' , currentPath: '/peminjam/list-peminjam' , user: user
+    }) %>
 
-    <div class="card">
-        <h2>Edit Peminjam</h2>
-
-        <% if (typeof error !=='undefined' && error) { %>
-            <div style="margin-top:10px;padding:10px;border-radius:8px;background:var(--danger);color:white;">
-                <%= error %>
-            </div>
-            <% } %>
-
-                <form method="POST" action="/peminjam/edit/<%= encodeURIComponent(peminjam.username) %>"
-                    style="margin-top:12px;max-width:700px;">
-                    <label class="small">Username (PK)</label>
-                    <input name="username" value="<%= peminjam.username %>" disabled
-                        style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin-top:6px;background:#f3f4f6;">
-
-                    <label class="small" style="margin-top:10px;display:block">Password (kosongkan jika tidak ingin
-                        mengubah)</label>
-                    <input name="password" type="password" placeholder="Password baru (opsional)"
-                        style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin-top:6px;">
-
-                    <label class="small" style="margin-top:10px;display:block">Nama Lengkap</label>
-                    <input name="nama_lengkap" required value="<%= peminjam.nama_lengkap || '' %>"
-                        placeholder="Nama lengkap"
-                        style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin-top:6px;">
-
-                    <label class="small" style="margin-top:10px;display:block">Alamat</label>
-                    <input name="alamat" value="<%= peminjam.alamat || '' %>" placeholder="Alamat (opsional)"
-                        style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin-top:6px;">
-
-                    <label class="small" style="margin-top:10px;display:block">No. Telepon</label>
-                    <input name="no_telpon" value="<%= peminjam.no_telpon || '' %>" placeholder="08xxxx"
-                        style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin-top:6px;">
-
-                    <label class="small" style="margin-top:10px;display:block">Status</label>
-                    <select name="status" required
-                        style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin-top:6px;">
-                        <option value="">-- Pilih status --</option>
-                        <option value="Admin" <%=peminjam.status==='Admin' ? 'selected' : '' %>>Admin</option>
-                        <option value="Anggota" <%=peminjam.status==='Anggota' ? 'selected' : '' %>>Anggota</option>
-                        <option value="Non-Anggota" <%=peminjam.status==='Non-Anggota' ? 'selected' : '' %>>Non-Anggota
-                        </option>
-                    </select>
-
-                    <label class="small" style="margin-top:10px;display:block">Tanggal Daftar</label>
-                    <input type="date" name="tgl_daftar"
-                        value="<%= peminjam.tgl_daftar ? peminjam.tgl_daftar.substring(0,10) : '' %>" required
-                        style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin-top:6px;">
-
-                    <div style="margin-top:14px;">
-                        <button class="btn" type="submit">Update</button>
-
-                        <a href="/peminjam/list-peminjam" class="btn"
-                            style="background:#6c757d;color:white;padding:8px 10px;border-radius:8px;border:none;margin-left:8px;">Batal</a>
+    <div class="main-content-wrapper">
+        <div class="container">
+            <div class="edit-card shadow-sm">
+                <div class="edit-header">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="icon-box">
+                            <i class="bi bi-person-gear"></i>
+                        </div>
+                        <div>
+                            <h2 class="m-0 h4 fw-bold">Edit Peminjam</h2>
+                            <p class="text-muted m-0 small">Kelola data penyewaan dan profil pengguna #<%=
+                                    peminjam.username %>
+                            </p>
+                        </div>
                     </div>
-                </form>
+                    <a href="/peminjam/list-peminjam" class="btn-close-custom" title="Batal">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                </div>
+
+                <div class="edit-body">
+                    <% if (typeof error !=='undefined' && error) { %>
+                        <div class="alert alert-danger border-0 shadow-sm mb-4 d-flex align-items-center"
+                            style="border-radius:12px;">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <%= error %>
+                        </div>
+                        <% } %>
+
+                            <form method="POST" action="/peminjam/edit/<%= encodeURIComponent(peminjam.username) %>">
+
+                                <h5 class="section-divider">Informasi Utama</h5>
+
+                                <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label-custom">Username (ID)</label>
+                                        <div class="input-group-custom disabled">
+                                            <i class="bi bi-key search-icon"></i>
+                                            <input type="text" value="<%= peminjam.username %>" disabled
+                                                class="form-control-custom">
+                                        </div>
+                                        <small class="text-muted mt-1 d-block px-1">ID unik tidak dapat diubah.</small>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label-custom">Password Baru</label>
+                                        <div class="input-group-custom">
+                                            <i class="bi bi-shield-lock search-icon"></i>
+                                            <input name="password" type="password"
+                                                placeholder="Kosongkan jika tidak diubah" class="form-control-custom">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label class="form-label-custom">Nama Lengkap</label>
+                                        <div class="input-group-custom">
+                                            <i class="bi bi-person-badge search-icon"></i>
+                                            <input name="nama_lengkap" required
+                                                value="<%= peminjam.nama_lengkap || '' %>"
+                                                placeholder="Masukkan nama lengkap" class="form-control-custom">
+                                        </div>
+                                    </div>
+
+                                    <h5 class="section-divider mt-5">Detail Kontak & Status</h5>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label-custom">No. Telepon</label>
+                                        <div class="input-group-custom">
+                                            <i class="bi bi-telephone search-icon"></i>
+                                            <input name="no_telpon" value="<%= peminjam.no_telpon || '' %>"
+                                                placeholder="08xxxxxxxxxx" class="form-control-custom">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label-custom">Tanggal Pendaftaran</label>
+                                        <div class="input-group-custom">
+                                            <i class="bi bi-calendar3 search-icon"></i>
+                                            <input type="date" name="tgl_daftar"
+                                                value="<%= peminjam.tgl_daftar ? peminjam.tgl_daftar.substring(0,10) : '' %>"
+                                                required class="form-control-custom">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label class="form-label-custom">Status Keanggotaan</label>
+                                        <div class="input-group-custom">
+                                            <i class="bi bi-check-circle search-icon"></i>
+                                            <select name="status" required class="form-control-custom">
+                                                <option value="">-- Pilih status --</option>
+                                                <option value="Admin" <%=peminjam.status==='Admin' ? 'selected' : '' %>
+                                                    >Admin</option>
+                                                <option value="Anggota" <%=peminjam.status==='Anggota' ? 'selected' : ''
+                                                    %>>Anggota</option>
+                                                <option value="Non-Anggota" <%=peminjam.status==='Non-Anggota'
+                                                    ? 'selected' : '' %>>Non-Anggota</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label class="form-label-custom">Alamat Domisili</label>
+                                        <div class="input-group-custom align-items-start py-2">
+                                            <i class="bi bi-geo-alt search-icon mt-2"></i>
+                                            <textarea name="alamat" rows="3" placeholder="Alamat lengkap (opsional)"
+                                                class="form-control-custom"><%= peminjam.alamat || '' %></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="action-footer mt-5">
+                                    <button type="submit" class="btn-save-custom">
+                                        <i class="bi bi-save me-2"></i> Simpan Perubahan
+                                    </button>
+                                    <a href="/peminjam/list-peminjam" class="btn-cancel-custom">
+                                        Batal
+                                    </a>
+                                </div>
+                            </form>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <style>
+        .main-content-wrapper {
+            padding: 60px 15px;
+            background-color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        .edit-card {
+            background: white;
+            max-width: 800px;
+            margin: 0 auto;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid #eef2f6;
+        }
+
+        /* Header Styling */
+        .edit-header {
+            padding: 25px 30px;
+            background: #ffffff;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            background: #f0f4ff;
+            color: #4f46e5;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .btn-close-custom {
+            color: #94a3b8;
+            font-size: 1.2rem;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .btn-close-custom:hover {
+            color: #dc2626;
+            transform: rotate(90deg);
+        }
+
+        /* Form Styling */
+        .edit-body {
+            padding: 40px;
+        }
+
+        .section-divider {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #1e293b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #f8fafc;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+        }
+
+        .form-label-custom {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #475569;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .input-group-custom {
+            display: flex;
+            align-items: center;
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 0 15px;
+            transition: 0.3s;
+        }
+
+        .input-group-custom:focus-within {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        .input-group-custom.disabled {
+            background: #f8fafc;
+            cursor: not-allowed;
+        }
+
+        .search-icon {
+            color: #94a3b8;
+            margin-right: 12px;
+        }
+
+        .form-control-custom {
+            border: none;
+            background: transparent;
+            padding: 12px 0;
+            width: 100%;
+            outline: none;
+            font-size: 0.95rem;
+            color: #1e293b;
+        }
+
+        textarea.form-control-custom {
+            resize: none;
+        }
+
+        /* Footer Buttons */
+        .action-footer {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-save-custom {
+            background: #4f46e5;
+            color: white;
+            border-radius: 14px;
+            padding: 14px 30px;
+            font-weight: 600;
+            border: none;
+            transition: 0.3s;
+            flex: 2;
+        }
+
+        .btn-save-custom:hover {
+            background: #4338ca;
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn-cancel-custom {
+            background: #f8fafc;
+            color: #64748b;
+            border-radius: 14px;
+            padding: 14px 30px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1.5px solid #e2e8f0;
+            transition: 0.3s;
+            flex: 1;
+            text-align: center;
+        }
+
+        .btn-cancel-custom:hover {
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .edit-body {
+                padding: 30px 20px;
+            }
+
+            .action-footer {
+                flex-direction: column;
+            }
+
+            .btn-save-custom,
+            .btn-cancel-custom {
+                width: 100%;
+                order: 1;
+            }
+
+            .btn-cancel-custom {
+                order: 2;
+            }
+
+            /* Tombol batal di bawah di mobile */
+        }
+    </style>
 
     <%- include('../../partials/footer.ejs') %>

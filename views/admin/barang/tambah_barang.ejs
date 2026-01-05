@@ -1,68 +1,262 @@
 <%- include('../../partials/header.ejs') %>
+
     <% const rawRole=(typeof user !=='undefined' && (user.role || user.status)) || '' ; const
         roleNorm=String(rawRole).toLowerCase().replace(/\s+/g,'').replace(/[_-]/g,''); const isAdmin=roleNorm==='admin'
         ; %>
 
-        <div class="container mt-4">
-            <h2>Tambah Barang</h2>
-
-            <% if (typeof error !=='undefined' && error) { %>
-                <div class="alert alert-danger">
-                    <%= error %>
-                </div>
-                <% } %>
-                    <% if (typeof success !=='undefined' && success) { %>
-                        <div class="alert alert-success">
-                            <%= success %>
+        <div class="main-content-wrapper">
+            <div class="container">
+                <div class="form-card">
+                    <div class="form-header">
+                        <div class="header-title">
+                            <span class="icon">📦</span>
+                            <div>
+                                <h2>Tambah Barang</h2>
+                                <p>Masukkan detail inventaris barang baru ke sistem</p>
+                            </div>
                         </div>
-                        <% } %>
+                        <a href="/barang/list-barang" class="btn-close-form">&times;</a>
+                    </div>
 
-                            <% if (!isAdmin) { %>
-                                <div class="alert alert-warning">Anda tidak memiliki izin untuk menambah barang.</div>
-                                <% } else { %>
-                                    <form method="post" action="/barang/create" enctype="multipart/form-data">
-                                        <div class="mb-3">
-                                            <label class="form-label">Nama Barang</label>
-                                            <input type="text" name="nama_barang" class="form-control" required>
-                                        </div>
+                    <div class="form-body">
+                        <% if (typeof error !=='undefined' && error) { %>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                <%= error %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                            </div>
+                            <% } %>
 
-                                        <div class="row">
-                                            <div class="col-md-4 mb-3">
-                                                <label class="form-label">Jumlah Total</label>
-                                                <input type="number" name="jumlah_total" class="form-control" min="0"
-                                                    value="0" required>
+                                <% if (!isAdmin) { %>
+                                    <div class="empty-state">
+                                        <div class="icon">🚫</div>
+                                        <h4>Akses Ditolak</h4>
+                                        <p>Anda tidak memiliki izin untuk menambah data barang.</p>
+                                        <a href="/barang/list-barang" class="btn btn-secondary">Kembali ke Daftar</a>
+                                    </div>
+                                    <% } else { %>
+                                        <form method="post" action="/barang/create" enctype="multipart/form-data">
+
+                                            <div class="mb-4">
+                                                <label class="form-label fw-bold">Nama Barang</label>
+                                                <input type="text" name="nama_barang"
+                                                    class="form-control form-control-lg custom-input"
+                                                    placeholder="Masukkan nama barang..." required>
                                             </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label class="form-label">Stok Tersedia</label>
-                                                <input type="number" name="stok_tersedia" class="form-control" min="0"
-                                                    value="0" required>
+
+                                            <div class="row">
+                                                <div class="col-md-4 mb-4">
+                                                    <label class="form-label fw-bold">Jumlah Total</label>
+                                                    <input type="number" name="jumlah_total"
+                                                        class="form-control custom-input" min="0" value="0" required>
+                                                </div>
+                                                <div class="col-md-4 mb-4">
+                                                    <label class="form-label fw-bold">Stok Tersedia</label>
+                                                    <input type="number" name="stok_tersedia"
+                                                        class="form-control custom-input" min="0" value="0" required>
+                                                </div>
+                                                <div class="col-md-4 mb-4">
+                                                    <label class="form-label fw-bold">Satuan</label>
+                                                    <input type="text" name="satuan_jumlah"
+                                                        class="form-control custom-input"
+                                                        placeholder="Pcs / Unit / Biji">
+                                                </div>
                                             </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label class="form-label">Satuan</label>
-                                                <input type="text" name="satuan_jumlah" class="form-control"
-                                                    placeholder="pcs / box / kg / liter">
+
+                                            <div class="mb-4">
+                                                <label class="form-label fw-bold">Harga Dasar Sewa (Rp / Hari)</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-light border-end-0">Rp</span>
+                                                    <input type="number" name="harga_dasar_sewa"
+                                                        class="form-control border-start-0 custom-input" min="0"
+                                                        value="0" required>
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        <div class="mb-3">
-                                            <label class="form-label">Harga Dasar Sewa (Rp)</label>
-                                            <input type="number" name="harga_dasar_sewa" class="form-control" min="0"
-                                                value="0" required>
-                                        </div>
+                                            <hr class="my-4" style="opacity: 0.1;">
 
-                                        <div class="mb-3">
-                                            <label for="photo" class="form-label">Foto Barang (gambar)</label>
-                                            <input class="form-control" type="file" id="photo" name="photo"
-                                                accept="image/*" required>
-                                            <div class="form-text">Maks 5MB. Format gambar saja.</div>
-                                        </div>
+                                            <div class="mb-4">
+                                                <label for="photo" class="form-label fw-bold">Foto Barang</label>
+                                                <div class="upload-container">
+                                                    <input class="form-control custom-file-input" type="file" id="photo"
+                                                        name="photo" accept="image/*" required>
+                                                    <div class="form-text mt-2 text-muted">
+                                                        <i class="bi bi-info-circle me-1"></i> Format: JPG, PNG, WEBP
+                                                        (Maks 5MB).
+                                                    </div>
+                                                </div>
+                                            </div>
 
-                                        <div class="d-flex gap-2">
-                                            <button type="submit" class="btn btn-success">Simpan</button>
-                                            <a href="/barang/list-barang" class="btn btn-secondary">Batal</a>
-                                        </div>
-                                    </form>
-                                    <% } %>
+                                            <div class="form-actions">
+                                                <button type="submit" class="btn-save">
+                                                    <span>💾</span> Simpan Barang
+                                                </button>
+                                                <a href="/barang/list-barang" class="btn-cancel">Batal</a>
+                                            </div>
+                                        </form>
+                                        <% } %>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <style>
+            /* Menggunakan Base Style yang sama dengan Edit Barang */
+            .main-content-wrapper {
+                padding: 100px 15px 50px 15px;
+                background-color: #f8fafc;
+                min-height: 100vh;
+            }
+
+            .form-card {
+                background: white;
+                max-width: 800px;
+                margin: 0 auto;
+                border-radius: 16px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+                overflow: hidden;
+                border: 1px solid #e2e8f0;
+            }
+
+            .form-header {
+                background: #ffffff;
+                padding: 25px 30px;
+                border-bottom: 1px solid #f1f5f9;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .header-title {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .header-title .icon {
+                font-size: 2rem;
+                background: #f0fdf4;
+                /* Hijau muda untuk kesan 'tambah' */
+                padding: 10px;
+                border-radius: 12px;
+            }
+
+            .header-title h2 {
+                margin: 0;
+                font-size: 1.5rem;
+                color: #1e293b;
+                font-weight: 700;
+            }
+
+            .header-title p {
+                margin: 0;
+                color: #64748b;
+                font-size: 0.9rem;
+            }
+
+            .btn-close-form {
+                text-decoration: none;
+                color: #94a3b8;
+                font-size: 2rem;
+                line-height: 1;
+                transition: 0.2s;
+            }
+
+            .btn-close-form:hover {
+                color: #ef4444;
+            }
+
+            .form-body {
+                padding: 30px;
+            }
+
+            .custom-input {
+                border: 1.5px solid #e2e8f0;
+                border-radius: 10px;
+                padding: 12px 15px;
+                transition: 0.3s;
+            }
+
+            .custom-input:focus {
+                border-color: #22c55e;
+                /* Hijau fokus */
+                box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
+                outline: none;
+            }
+
+            /* Buttons Area */
+            .form-actions {
+                display: flex;
+                gap: 12px;
+                margin-top: 30px;
+            }
+
+            .btn-save {
+                background: #22c55e;
+                color: white;
+                border: none;
+                padding: 12px 25px;
+                border-radius: 10px;
+                font-weight: 600;
+                flex: 2;
+                transition: 0.3s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                cursor: pointer;
+            }
+
+            .btn-save:hover {
+                background: #16a34a;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+            }
+
+            .btn-cancel {
+                background: #f1f5f9;
+                color: #475569;
+                text-decoration: none;
+                padding: 12px 25px;
+                border-radius: 10px;
+                font-weight: 600;
+                flex: 1;
+                text-align: center;
+                transition: 0.3s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 1px solid #e2e8f0;
+            }
+
+            .btn-cancel:hover {
+                background: #e2e8f0;
+                color: #1e293b;
+            }
+
+            /* Responsive untuk Mobile agar tombol tidak terpotong */
+            @media (max-width: 576px) {
+                .form-header {
+                    padding: 20px;
+                }
+
+                .form-body {
+                    padding: 20px;
+                }
+
+                .form-actions {
+                    flex-direction: column;
+                    width: 100%;
+                }
+
+                .btn-save,
+                .btn-cancel {
+                    width: 100%;
+                    flex: none;
+                    padding: 15px;
+                }
+            }
+        </style>
 
         <%- include('../../partials/footer.ejs') %>

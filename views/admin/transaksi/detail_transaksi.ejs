@@ -1,128 +1,393 @@
 <%- include('../../partials/header.ejs') %>
-    <div class="container mt-4">
-        <h2>Detail Transaksi #<%= transaksi.id_transaksi %>
-        </h2>
 
-        <div class="card mb-3">
-            <div class="card-body">
-                <dl class="row mb-0">
-                    <dt class="col-sm-3">Username</dt>
-                    <dd class="col-sm-9">
-                        <%= transaksi.username %>
-                    </dd>
+    <% const list=Array.isArray(details) ? details : (transaksi.detail_transaksis ? transaksi.detail_transaksis : []);
+        const userInfo=transaksi.username_peminjam || {}; let runningTotal=0; 
+    %>
 
-                    <dt class="col-sm-3">Tanggal Sewa</dt>
-                    <dd class="col-sm-9">
-                        <%= transaksi.tgl_sewa %>
-                    </dd>
+        <div class="main-content-wrapper">
+            <div class="container">
+                <div class="header-nav mb-4">
+                    <a href="/transaksi/list-transaksi" class="btn-back">
+                        <i class="bi bi-arrow-left"></i> Kembali ke Daftar
+                    </a>
+                    <div class="breadcrumb-text">Detail Transaksi / #<%= transaksi.id_transaksi %>
+                    </div>
+                </div>
 
-                    <dt class="col-sm-3">Tanggal Pengembalian</dt>
-                    <dd class="col-sm-9">
-                        <%= transaksi.tgl_pengembalian || '-' %>
-                    </dd>
+                <div class="detail-card">
+                    <div class="status-header">
+                        <div class="d-flex justify-content-between align-items-center w-100">
+                            <h5 class="m-0 fw-bold text-white">RINCIAN PENYEWAAN</h5>
+                            <div class="status-badge-modern <%= (transaksi.status_transaksi || '').toLowerCase() %>">
+                                <%= (transaksi.status_transaksi || 'PENDING' ).toUpperCase() %>
+                            </div>
+                        </div>
+                    </div>
 
-                    <dt class="col-sm-3">Status</dt>
-                    <dd class="col-sm-9">
-                        <%= transaksi.status_transaksi %>
-                    </dd>
+                    <div class="card-body-content">
+                        <div class="row g-5">
+                            <div class="col-lg-5">
+                                <section class="info-section">
+                                    <h6 class="section-label">Informasi Peminjam</h6>
+                                    <div class="user-profile-card">
+                                        <div class="avatar-circle">
+                                            <%= (userInfo.nama_lengkap || transaksi.username || 'U'
+                                                ).charAt(0).toUpperCase() %>
+                                        </div>
+                                        <div class="ms-3">
+                                            <h5 class="peminjam-name">
+                                                <%= userInfo.nama_lengkap || transaksi.username %>
+                                            </h5>
+                                            <p class="peminjam-user">@<%= transaksi.username %>
+                                            </p>
+                                        </div>
+                                    </div>
 
-                    <dt class="col-sm-3">Total Biaya Sewa</dt>
-                    <dd class="col-sm-9">
-                        Rp <%= (Number(transaksi.total_biaya_sewa) || 0).toLocaleString('id-ID', {
-                            minimumFractionDigits: 0, maximumFractionDigits: 0 }) %>
-                    </dd>
+                                    <div class="contact-grid">
+                                        <div class="contact-item">
+                                            <small>No. Telepon</small>
+                                            <p>
+                                                <%= userInfo.no_telpon || '-' %>
+                                            </p>
+                                        </div>
+                                        <div class="contact-item">
+                                            <small>Alamat</small>
+                                            <p>
+                                                <%= userInfo.alamat || '-' %>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </section>
 
-                    <dt class="col-sm-3">Total DP</dt>
-                    <dd class="col-sm-9">
-                        Rp <%= (Number(transaksi.total_dp) || 0).toLocaleString('id-ID', { minimumFractionDigits: 0,
-                            maximumFractionDigits: 0 }) %>
-                    </dd>
-                </dl>
+                                <section class="info-section mt-5">
+                                    <h6 class="section-label">Waktu Sewa</h6>
+                                    <div class="time-box">
+                                        <div class="time-item">
+                                            <span class="icon">📅</span>
+                                            <div>
+                                                <small>Tgl Sewa</small>
+                                                <p>
+                                                    <%= transaksi.tgl_sewa %>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="time-item">
+                                            <span class="icon">⏳</span>
+                                            <div>
+                                                <small>Tgl Kembali</small>
+                                                <p>
+                                                    <%= transaksi.tgl_pengembalian || '-' %>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
 
-                <div class="mt-3">
-                    <a href="/transaksi/edit/<%= transaksi.id_transaksi %>" class="btn btn-warning">Edit</a>
+                            <div class="col-lg-7">
+                                <section class="info-section">
+                                    <h6 class="section-label">Ringkasan Barang</h6>
+                                    <div class="item-list">
+                                        <% list.forEach((d)=> {
+                                            const subtotal = Number(d.total_harga_sewa || (d.jumlah_sewa *
+                                            d.harga_sewa_per_satuan) || 0);
+                                            runningTotal += subtotal;
+                                            %>
+                                            <div class="item-row">
+                                                <div class="item-img-wrapper">
+                                                    <img src="<%= (d.barang && d.barang.photo_path) ? d.barang.photo_path : '/img/default-product.png' %>"
+                                                        onerror="this.src='/img/default-product.png'">
+                                                </div>
+                                                <div class="item-detail">
+                                                    <span class="fw-bold d-block">
+                                                        <%= (d.barang && d.barang.nama_barang) || d.nama_barang %>
+                                                    </span>
+                                                    <small class="text-muted">
+                                                        <%= d.jumlah_sewa %> unit x Rp <%=
+                                                                Number(d.harga_sewa_per_satuan ||
+                                                                0).toLocaleString('id-ID') %>
+                                                    </small>
+                                                </div>
+                                                <div class="item-subtotal">
+                                                    Rp <%= subtotal.toLocaleString('id-ID') %>
+                                                </div>
+                                            </div>
+                                            <% }) %>
+                                    </div>
 
-                    <form action="/transaksi/delete/<%= transaksi.id_transaksi %>" method="post" style="display:inline"
-                        onsubmit="return confirm('Hapus transaksi ini?');">
-                        <button class="btn btn-danger">Hapus</button>
-                    </form>
+                                    <div class="payment-summary">
+                                        <div class="pay-row">
+                                            <span>Grand Total</span>
+                                            <span>Rp <%= runningTotal.toLocaleString('id-ID') %></span>
+                                        </div>
+                                        <div class="pay-row text-success">
+                                            <span>Total DP (Dibayar)</span>
+                                            <span>- Rp <%= (Number(transaksi.total_dp) || 0).toLocaleString('id-ID') %>
+                                                    </span>
+                                        </div>
+                                        <div class="pay-row total">
+                                            <span>Sisa Tagihan</span>
+                                            <span class="text-danger">Rp <%= (runningTotal - (Number(transaksi.total_dp)
+                                                    || 0)).toLocaleString('id-ID') %></span>
+                                        </div>
+                                    </div>
 
-                    <a href="/transaksi/list-transaksi" class="btn btn-secondary">Kembali</a>
+                                    <div class="action-buttons mt-4">
+                                        <a href="/transaksi/edit/<%= transaksi.id_transaksi %>"
+                                            class="btn-edit-modern">Edit</a>
+                                        <form action="/transaksi/delete/<%= transaksi.id_transaksi %>" method="post"
+                                            onsubmit="return confirm('Hapus transaksi?');" class="flex-grow-1">
+                                            <button class="btn-delete-modern">Hapus</button>
+                                        </form>
+                                    </div>
+                                </section>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Daftar barang yang disewa -->
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Barang yang disewa</h5>
+        <style>
+            :root {
+                --primary-blue: #3b82f6;
+                --dark-navy: #1e293b;
+                --border-color: #e2e8f0;
+                --bg-light: #f8fafc;
+            }
 
-                <% // pakai properti sesuai association: detail_transaksis const
-                    details=Array.isArray(transaksi.detail_transaksis) ? transaksi.detail_transaksis : []; let
-                    grandTotal=0; %>
+            .main-content-wrapper {
+                background: var(--bg-light);
+                padding: 40px 0;
+                min-height: 100vh;
+                font-family: 'Inter', sans-serif;
+            }
 
-                    <% if (details.length> 0) { %>
-                        <div class="table-responsive">
-                            <table class="table table-striped table-bordered">
-                                <thead class="thead-light">
-                                    <tr>
-                                        <th style="width:48px">#</th>
-                                        <th>Nama Barang</th>
-                                        <th style="width:120px">Jumlah</th>
-                                        <th style="width:160px">Harga / Satuan</th>
-                                        <th style="width:160px">Total Harga</th>
-                                        <th style="width:140px">Kembali Bagus</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% details.forEach(function(d, idx) { const jumlah=Number(d.jumlah_sewa) || 0; const
-                                        hargaSatuan=Number(d.harga_sewa_per_satuan) || 0; const
-                                        totalItem=Number(d.total_harga_sewa) || (jumlah * hargaSatuan) || 0; grandTotal
-                                        +=totalItem; let namaBarang='-' ; if (d.barang && (d.barang.nama_barang ||
-                                        d.barang.nama)) { namaBarang=d.barang.nama_barang || d.barang.nama; } else if
-                                        (d.nama_barang) { namaBarang=d.nama_barang; } else if (d.id_barang) {
-                                        namaBarang='ID: ' + d.id_barang; } %>
-                                        <tr>
-                                            <td>
-                                                <%= idx + 1 %>
-                                            </td>
-                                            <td>
-                                                <%= namaBarang %>
-                                            </td>
-                                            <td class="text-center">
-                                                <%= jumlah %>
-                                            </td>
-                                            <td class="text-right">
-                                                Rp <%= (hargaSatuan).toLocaleString('id-ID', { minimumFractionDigits: 0,
-                                                    maximumFractionDigits: 0 }) %>
-                                            </td>
-                                            <td class="text-right">
-                                                Rp <%= (totalItem).toLocaleString('id-ID', { minimumFractionDigits: 0,
-                                                    maximumFractionDigits: 0 }) %>
-                                            </td>
-                                            <td class="text-center">
-                                                <%= Number(d.qty_kembali_bagus || 0) %>
-                                            </td>
-                                        </tr>
-                                        <% }) %>
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <th colspan="4" class="text-right">Grand Total</th>
-                                        <th class="text-right">Rp <%= (grandTotal).toLocaleString('id-ID', {
-                                                minimumFractionDigits: 0, maximumFractionDigits: 0 }) %>
-                                        </th>
-                                        <th></th>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                        <% } else { %>
-                            <p class="mb-0">Tidak ada barang untuk transaksi ini. (Jika Anda yakin harus ada, pastikan
-                                controller meng-attach <code>transaksi.detail_transaksis</code> — gunakan association
-                                atau fetch terpisah.)</p>
-                            <% } %>
-            </div>
-        </div>
-    </div>
-    <%- include('../../partials/footer.ejs') %>
+            /* Navigation */
+            .header-nav {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .btn-back {
+                padding: 8px 16px;
+                border-radius: 8px;
+                border: 1px solid var(--border-color);
+                background: white;
+                color: var(--dark-navy);
+                text-decoration: none;
+                font-weight: 500;
+                font-size: 0.9rem;
+            }
+
+            .breadcrumb-text {
+                color: #94a3b8;
+                font-size: 0.9rem;
+            }
+
+            /* Card Layout */
+            .detail-card {
+                background: white;
+                border-radius: 16px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+                border: 1px solid var(--border-color);
+                overflow: hidden;
+            }
+
+            /* Header Status Section */
+            .status-header {
+                background: white;
+                padding: 20px 40px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .status-badge-modern {
+                padding: 6px 16px;
+                border-radius: 20px;
+                font-weight: 800;
+                font-size: 0.75rem;
+                color: white;
+            }
+
+            .status-badge-modern.selesai,
+            .status-badge-modern.aktif {
+                background: #10b981;
+            }
+
+            .status-badge-modern.terlambat {
+                background: #ef4444;
+            }
+
+            .status-badge-modern.pending {
+                background: #f59e0b;
+            }
+
+            .card-body-content {
+                padding: 40px;
+            }
+
+            .section-label {
+                font-size: 0.75rem;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                color: #64748b;
+                font-weight: 700;
+                margin-bottom: 20px;
+                display: block;
+                border-bottom: 2px solid var(--bg-light);
+                padding-bottom: 8px;
+            }
+
+            /* User Profile */
+            .user-profile-card {
+                display: flex;
+                align-items: center;
+                margin-bottom: 25px;
+            }
+
+            .avatar-circle {
+                width: 50px;
+                height: 50px;
+                margin-right: 10px;
+                background: var(--primary-blue);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 12px;
+                font-weight: bold;
+                font-size: 1.2rem;
+            }
+
+            .peminjam-name {
+                margin: 0;
+                font-weight: 700;
+                color: var(--dark-navy);
+            }
+
+            .peminjam-user {
+                margin: 0;
+                font-size: 0.85rem;
+                color: #64748b;
+            }
+
+            /* Contact & Time Grid */
+            .contact-item small,
+            .time-item small {
+                color: #94a3b8;
+                font-size: 0.75rem;
+                font-weight: 600;
+            }
+
+            .contact-item p,
+            .time-item p {
+                color: var(--dark-navy);
+                font-weight: 600;
+                margin-bottom: 15px;
+            }
+
+            .time-box {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+                background: var(--bg-light);
+                padding: 20px;
+                border-radius: 12px;
+            }
+
+            .time-item {
+                display: flex;
+                gap: 10px;
+            }
+
+            /* Item List */
+            .item-row {
+                display: flex;
+                align-items: center;
+                padding: 15px 0;
+                border-bottom: 1px solid var(--bg-light);
+                gap: 15px;
+            }
+
+            .item-img-wrapper img {
+                width: 60px;
+                height: 60px;
+                object-fit: cover;
+                border-radius: 10px;
+            }
+
+            .item-detail {
+                flex-grow: 1;
+            }
+
+            .item-subtotal {
+                font-weight: 700;
+                color: var(--dark-navy);
+            }
+
+            /* Payment Summary */
+            .payment-summary {
+                margin-top: 30px;
+                background: var(--bg-light);
+                padding: 25px;
+                border-radius: 15px;
+            }
+
+            .pay-row {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 10px;
+                font-weight: 600;
+            }
+
+            .pay-row.total {
+                border-top: 2px dashed #cbd5e1;
+                margin-top: 15px;
+                padding-top: 15px;
+                font-size: 1.2rem;
+                font-weight: 800;
+            }
+
+            /* Actions */
+            .action-buttons {
+                display: flex;
+                gap: 15px;
+            }
+
+            .btn-edit-modern {
+                flex: 1;
+                background: var(--dark-navy);
+                color: white;
+                padding: 12px;
+                border-radius: 10px;
+                text-align: center;
+                text-decoration: none;
+                font-weight: 600;
+                transition: 0.3s;
+            }
+
+            .btn-delete-modern {
+                width: 100%;
+                background: #fee2e2;
+                color: #991b1b;
+                border: none;
+                padding: 12px;
+                border-radius: 10px;
+                font-weight: 600;
+                transition: 0.3s;
+            }
+
+            .btn-edit-modern:hover {
+                opacity: 0.9;
+            }
+
+            /* ===== MOBILE ===== */
+            @media (max-width: 768px) {
+                .container {
+                    padding: 20px;
+                }
+            }
+        </style>
+
+        <%- include('../../partials/footer.ejs') %>
